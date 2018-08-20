@@ -66,6 +66,10 @@ class allinclusive_multigrid_nonMPI(controller):
         if self.nlevels > 1 and self.nsweeps[-1] > 1:
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
+        if self.nlevels > 1 and self.params.predict_type is not None:
+            self.logger.warning('you have specified a predictor type but only a single level.. '
+                                'predictor will be ignored')
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -218,6 +222,42 @@ class allinclusive_multigrid_nonMPI(controller):
             all active steps
         """
 
+        if self.params.predict_type is None:
+            pass
+
+        elif self.params.predict_type == 'fine_only':
+            for S in MS:
+                # standard sweep workflow: update nodes, compute residual, log progress
+                self.hooks.pre_sweep(step=S, level_number=0)
+                S.levels[0].sweep.update_nodes()
+
+            for S in MS:
+                # send updated values forward
+                if self.params.fine_comm and not S.status.last:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                      % (S.status.slot, 0, S.status.iter))
+                    self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
+
+                # # receive values
+                if self.params.fine_comm and not S.status.first:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                      (S.status.slot, S.prev.status.slot, 0, S.status.iter))
+                    self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
+
+                S.levels[0].sweep.compute_residual()
+                self.hooks.post_sweep(step=S, level_number=0)
+
+        elif self.params.predict_type == 'libpfasst_style':
+            raise NotImplementedError('libpfasst predictor is not yet implemented')
+        elif self.params.predict_type == 'pfasst_burnin':
+            raise NotImplementedError('pfasst burnin predictor is not yet implemented')
+        elif self.params.predict_type == 'fmg':
+            raise NotImplementedError('FMG predictor is not yet implemented')
+        else:
+            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
+
+        return MS
+
         # loop over all steps
         for S in MS:
 
@@ -289,7 +329,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
+                if len(S.levels) > 1:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
                     S.status.stage = 'IT_CHECK'

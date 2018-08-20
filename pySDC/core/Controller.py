@@ -11,7 +11,7 @@ from pySDC.core.BaseTransfer import base_transfer
 class _Pars(FrozenClass):
     def __init__(self, params):
         self.fine_comm = True
-        self.predict = True
+        self.predict_type = None
         self.logger_level = 20
         self.log_to_file = False
         self.dump_setup = True
@@ -19,6 +19,9 @@ class _Pars(FrozenClass):
 
         for k, v in params.items():
             setattr(self, k, v)
+
+        if hasattr(self, 'predict'):
+            raise NotImplementedError('predict flag is ignored, use predict_type instead')
 
         self._freeze()
 

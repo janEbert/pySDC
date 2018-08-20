@@ -21,7 +21,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-14
+    level_params['restol'] = 1E-12
     level_params['dt'] = 0.9 / 32
     level_params['nsweeps'] = 1
 
@@ -49,7 +49,7 @@ def main():
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = libpfasst_output
-    controller_params['predict'] = False
+    controller_params['predict_type'] = 'fine_only'
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -69,8 +69,8 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = level_params['dt']
-    num_proc = 1
+    num_proc = 4
+    Tend = num_proc * level_params['dt']
 
     # instantiate controller
     controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
