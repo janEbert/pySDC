@@ -28,7 +28,7 @@ def main():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5, 3, 2]
+    sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['spread'] = True
     sweeper_params['do_coll_update'] = False
@@ -37,8 +37,8 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 0.02  # diffusion coefficient
     problem_params['c'] = 1.0   # advection speed
-    problem_params['freq'] = -1  # frequency for the test value
-    problem_params['nvars'] = [256, 128, 64]  # number of degrees of freedom for each level
+    problem_params['freq'] = 1  # frequency for the test value
+    problem_params['nvars'] = [64, 32, 16]  # number of degrees of freedom for each level
     problem_params['L'] = 1.0   # length of the interval [-L/2, L/2]
 
     # initialize step parameters
@@ -49,18 +49,20 @@ def main():
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = libpfasst_output
-    controller_params['predict_type'] = 'fine_only'
+    # controller_params['predict_type'] = 'fine_only'
+    # controller_params['predict_type'] = 'pfasst_burnin'
+    # controller_params['predict_type'] = 'libpfasst_style'
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    # description['problem_class'] = advectiondiffusion1d_imex # pass problem class
-    description['problem_class'] = advectiondiffusion1d_implicit # pass problem class
+    description['problem_class'] = advectiondiffusion1d_imex # pass problem class
+    # description['problem_class'] = advectiondiffusion1d_implicit # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['dtype_u'] = mesh  # pass data type for u
-    # description['dtype_f'] = rhs_imex_mesh # pass data type for f
-    description['dtype_f'] = mesh # pass data type for f
-    # description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_class'] = generic_implicit  # pass sweeper
+    description['dtype_f'] = rhs_imex_mesh # pass data type for f
+    # description['dtype_f'] = mesh # pass data type for f
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    # description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
