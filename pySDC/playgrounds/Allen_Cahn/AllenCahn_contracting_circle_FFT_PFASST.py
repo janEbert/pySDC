@@ -58,7 +58,7 @@ def setup_parameters(nsweeps=None):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = monitor
-    controller_params['predict'] = False
+    controller_params['predict_type'] = 'fine_only'
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -120,7 +120,7 @@ def run_variant(nsweeps):
     Tend = 0.032
 
     # instantiate controller
-    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob

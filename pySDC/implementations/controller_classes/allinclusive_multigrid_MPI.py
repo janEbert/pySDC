@@ -50,6 +50,10 @@ class allinclusive_multigrid_MPI(controller):
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
+        if num_levels == 1 and self.params.predict_type is not None:
+            self.logger.warning('you have specified a predictor type but only a single level.. '
+                                'predictor will be ignored')
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
@@ -158,16 +162,24 @@ class allinclusive_multigrid_MPI(controller):
             comm: communicator
         """
 
-        # restrict to coarsest level
-        for l in range(1, len(self.S.levels)):
-            self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+        if self.params.predict_type is None:
+            pass
 
-        for p in range(self.S.status.slot + 1):
+        elif self.params.predict_type == 'fine_only':
 
-            if not p == 0 and not self.S.status.first:
-                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+            # do a fine sweep only
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'libpfasst_style':
+
+            # restrict to coarsest level
+            for l in range(1, len(self.S.levels)):
+                self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+
+            if not self.S.status.first:
+                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   self.S.status.iter, p))
+                                   self.S.status.iter))
                 self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep with new values
@@ -175,14 +187,59 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[-1].sweep.compute_end_point()
 
             if not self.S.status.last:
-                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   self.S.status.iter, p))
+                                   self.S.status.iter))
                 self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-        # interpolate back to finest level
-        for l in range(len(self.S.levels) - 1, 0, -1):
-            self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+            # go back to fine level, sweeping
+            for l in range(len(self.S.levels) - 1, 0, -1):
+                # prolong values
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+                # on middle levels: do sweep as usual
+                if l - 1 > 0:
+                    self.S.levels[l - 1].sweep.update_nodes()
+
+            # end with a fine sweep
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'pfasst_burnin':
+
+            # restrict to coarsest level
+            for l in range(1, len(self.S.levels)):
+                self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+
+            for p in range(self.S.status.slot + 1):
+
+                if not p == 0 and not self.S.status.first:
+                    self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       self.S.status.iter, p))
+                    self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                # do the sweep with new values
+                self.S.levels[-1].sweep.update_nodes()
+                self.S.levels[-1].sweep.compute_end_point()
+
+                if not self.S.status.last:
+                    self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       self.S.status.iter, p))
+                    self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+
+            # interpolate back to finest level
+            for l in range(len(self.S.levels) - 1, 0, -1):
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+            # end this with a fine sweep
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'fmg':
+            # TODO: implement FMG predictor
+            raise NotImplementedError('FMG predictor is not yet implemented')
+
+        else:
+            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
     def pfasst(self, comm, num_procs):
         """
@@ -209,7 +266,7 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
+            if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
             else:
                 self.S.status.stage = 'IT_CHECK'
@@ -218,10 +275,14 @@ class allinclusive_multigrid_MPI(controller):
 
             # call predictor (serial)
 
+            self.hooks.pre_predict(step=self.S, level_number=0)
+
             self.predictor(comm)
 
+            self.hooks.post_predict(step=self.S, level_number=0)
+
             # update stage
-            self.hooks.pre_iteration(step=self.S, level_number=0)
+            # self.hooks.pre_iteration(step=self.S, level_number=0)
             self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
