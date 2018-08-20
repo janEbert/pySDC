@@ -149,6 +149,8 @@ class allinclusive_multigrid_MPI(controller):
             l.tag = None
         self.req_status = None
         self.req_send = []
+        self.S.status.prev_done = False
+        self.S.status.next_done = False
 
         for lvl in self.S.levels:
             lvl.status.time = time
@@ -308,13 +310,48 @@ class allinclusive_multigrid_MPI(controller):
 
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
-            all_done = comm.allgather(self.S.status.done)
+
+            # check if an open request of the status send is pending
+            if self.req_status is not None:
+                self.req_status.wait()
+
+            # send status forward
+            if not self.S.status.last:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
+
+            # recv status
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
+                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.S.status.done = self.S.status.done and self.S.status.prev_done
+
+            # send status forward
+            if not self.S.status.first:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.prev,
+                                   99, self.S.status.iter))
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.prev, tag=99)
+
+            # recv status
+            if not self.S.status.last and not self.S.status.next_done:
+                self.S.status.next_done = comm.recv(source=self.S.next, tag=99)
+                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev,
+                                   99, self.S.status.iter))
+                self.S.status.done = self.S.status.done and self.S.status.next_done
+
+            # all_done = comm.allgather(self.S.status.done)
 
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
             # if not everyone is ready yet, keep doing stuff
-            if not all(all_done):
+            if not self.S.status.done:
                 self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1

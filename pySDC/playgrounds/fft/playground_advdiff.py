@@ -28,7 +28,7 @@ def main():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [5, 3, 2]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['spread'] = True
     sweeper_params['do_coll_update'] = False
@@ -51,7 +51,7 @@ def main():
     controller_params['hook_class'] = libpfasst_output
     # controller_params['predict_type'] = 'fine_only'
     # controller_params['predict_type'] = 'pfasst_burnin'
-    # controller_params['predict_type'] = 'libpfasst_style'
+    controller_params['predict_type'] = 'libpfasst_style'
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -71,7 +71,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    num_proc = 4
+    num_proc = 1
     Tend = num_proc * level_params['dt']
 
     # instantiate controller
