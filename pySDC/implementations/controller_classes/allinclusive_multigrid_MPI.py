@@ -150,7 +150,6 @@ class allinclusive_multigrid_MPI(controller):
         self.req_status = None
         self.req_send = []
         self.S.status.prev_done = False
-        self.S.status.next_done = False
 
         for lvl in self.S.levels:
             lvl.status.time = time
@@ -299,7 +298,7 @@ class allinclusive_multigrid_MPI(controller):
                                    0, self.S.status.iter))
                 req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-            if not self.S.status.first and self.params.fine_comm:
+            if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    0, self.S.status.iter))
@@ -330,21 +329,6 @@ class allinclusive_multigrid_MPI(controller):
                                    99, self.S.status.iter))
                 self.S.status.done = self.S.status.done and self.S.status.prev_done
 
-            # send status forward
-            if not self.S.status.first:
-                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.prev,
-                                   99, self.S.status.iter))
-                self.req_status = comm.isend(self.S.status.done, dest=self.S.prev, tag=99)
-
-            # recv status
-            if not self.S.status.last and not self.S.status.next_done:
-                self.S.status.next_done = comm.recv(source=self.S.next, tag=99)
-                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev,
-                                   99, self.S.status.iter))
-                self.S.status.done = self.S.status.done and self.S.status.next_done
-
             # all_done = comm.allgather(self.S.status.done)
 
             if self.S.status.iter > 0:
@@ -352,7 +336,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # if not everyone is ready yet, keep doing stuff
             if not self.S.status.done:
-                self.S.status.done = False
+                # self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
                 self.hooks.pre_iteration(step=self.S, level_number=0)
@@ -362,7 +346,7 @@ class allinclusive_multigrid_MPI(controller):
                     self.S.status.stage = 'IT_FINE'
 
             else:
-                self.S.levels[0].sweep.compute_end_point()
+                self.S.levels[0].sweep.compute_end_point()  # TODO: is this really necessary?
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
 
@@ -388,7 +372,7 @@ class allinclusive_multigrid_MPI(controller):
                                        0, self.S.status.iter))
                     req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                if not self.S.status.first and self.params.fine_comm:
+                if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        0, self.S.status.iter))
@@ -427,7 +411,7 @@ class allinclusive_multigrid_MPI(controller):
                                            l, self.S.status.iter))
                         req_send = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                    if not self.S.status.first and self.params.fine_comm:
+                    if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                            l, self.S.status.iter))
@@ -450,7 +434,7 @@ class allinclusive_multigrid_MPI(controller):
             # sweeps on coarsest level (serial/blocking)
 
             # receive from previous step (if not first)
-            if not self.S.status.first:
+            if not self.S.status.first and not self.S.status.prev_done:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    len(self.S.levels) - 1, self.S.status.iter))
@@ -494,7 +478,7 @@ class allinclusive_multigrid_MPI(controller):
                                        l - 1, self.S.status.iter))
                     req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                if not self.S.status.first and self.params.fine_comm:
+                if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        l - 1, self.S.status.iter))
@@ -519,7 +503,7 @@ class allinclusive_multigrid_MPI(controller):
                             req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter,
                                                                        comm=comm)
 
-                        if not self.S.status.first and self.params.fine_comm:
+                        if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                                l - 1, self.S.status.iter))
