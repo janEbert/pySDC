@@ -292,20 +292,20 @@ class allinclusive_multigrid_MPI(controller):
 
             req_send = None
             self.S.levels[0].sweep.compute_end_point()
-            if not self.S.status.last and self.params.fine_comm:
-                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   0, self.S.status.iter))
-                req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
-
-            if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
-                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   0, self.S.status.iter))
-                self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
-
-            if not self.S.status.last and self.params.fine_comm:
-                req_send.wait()
+            # if not self.S.status.last and self.params.fine_comm:
+            #     self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+            #                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+            #                        0, self.S.status.iter))
+            #     req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+            #
+            # if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
+            #     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+            #                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+            #                        0, self.S.status.iter))
+            #     self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+            #
+            # if not self.S.status.last and self.params.fine_comm:
+            #     req_send.wait()
 
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
