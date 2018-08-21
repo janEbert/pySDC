@@ -52,6 +52,7 @@ def main():
     # controller_params['predict_type'] = 'fine_only'
     # controller_params['predict_type'] = 'pfasst_burnin'
     controller_params['predict_type'] = 'libpfasst_style'
+    controller_params['predict'] = 'libpfasst_style'
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -71,11 +72,11 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    num_proc = 1
+    num_proc = 2
     Tend = num_proc * level_params['dt']
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
                                              description=description)
 
     # get initial values on finest level
