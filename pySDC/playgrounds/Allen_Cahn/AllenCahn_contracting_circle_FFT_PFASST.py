@@ -56,7 +56,7 @@ def setup_parameters(nsweeps=None):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 10
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = monitor
     controller_params['predict_type'] = None
     controller_params['predict'] = False

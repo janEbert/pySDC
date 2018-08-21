@@ -281,10 +281,6 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].sweep.compute_residual()
             self.hooks.post_sweep(step=self.S, level_number=0)
 
-            # wait for pending sends before computing uend, if any
-            if len(self.req_send) > 0 and not self.S.status.last and self.params.fine_comm:
-                self.req_send[0].wait()
-
             self.S.levels[0].sweep.compute_end_point()
 
             # update stage
@@ -365,6 +361,12 @@ class allinclusive_classic_MPI(controller):
 
                 # prolong values
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+                # wait for pending sends before computing uend, if any
+                if len(self.req_send) > 0 and not self.S.status.last and self.params.fine_comm:
+                    self.req_send[0].wait()
+
+                self.S.levels[0].sweep.compute_end_point()
 
                 if not self.S.status.last and self.params.fine_comm:
                     self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
