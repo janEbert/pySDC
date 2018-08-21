@@ -240,13 +240,6 @@ class allinclusive_classic_MPI(controller):
             if self.req_status is not None:
                 self.req_status.wait()
 
-            # send status forward
-            if not self.S.status.last:
-                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
-                                   99, self.S.status.iter))
-                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
-
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
@@ -254,6 +247,13 @@ class allinclusive_classic_MPI(controller):
                                   (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
                                    99, self.S.status.iter))
                 self.S.status.done = self.S.status.done and self.S.status.prev_done
+
+            # send status forward
+            if not self.S.status.last:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
             if not self.S.status.done:

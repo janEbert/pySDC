@@ -17,13 +17,16 @@ class allinclusive_multigrid_nonMPI(controller):
 
     def __init__(self, num_procs, controller_params, description):
         """
-       Initialization routine for PFASST controller
+        Initialization routine for PFASST controller
 
-       Args:
+        Args:
            num_procs: number of parallel time steps (still serial, though), can be 1
            controller_params: parameter set for the controller and the steps
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
-       """
+        """
+
+        if 'predict' in controller_params:
+            raise ControllerError('predict flag is ignored, use predict_type instead')
 
         # call parent's initialization routine
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)

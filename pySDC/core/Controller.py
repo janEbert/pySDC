@@ -20,9 +20,6 @@ class _Pars(FrozenClass):
         for k, v in params.items():
             setattr(self, k, v)
 
-        if hasattr(self, 'predict'):
-            raise NotImplementedError('predict flag is ignored, use predict_type instead')
-
         self._freeze()
 
 

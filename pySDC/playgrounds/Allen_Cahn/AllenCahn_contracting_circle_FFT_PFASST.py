@@ -40,7 +40,7 @@ def setup_parameters(nsweeps=None):
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # This comes as read-in for the problem class
     problem_params = dict()
@@ -56,9 +56,10 @@ def setup_parameters(nsweeps=None):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 10
     controller_params['hook_class'] = monitor
-    controller_params['predict_type'] = 'fine_only'
+    controller_params['predict_type'] = None
+    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -120,7 +121,8 @@ def run_variant(nsweeps):
     Tend = 0.032
 
     # instantiate controller
-    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob

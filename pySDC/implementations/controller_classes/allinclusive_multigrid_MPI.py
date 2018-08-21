@@ -255,7 +255,7 @@ class allinclusive_multigrid_MPI(controller):
 
         stage = self.S.status.stage
 
-        self.logger.debug(stage)
+        self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
@@ -314,13 +314,6 @@ class allinclusive_multigrid_MPI(controller):
             if self.req_status is not None:
                 self.req_status.wait()
 
-            # send status forward
-            if not self.S.status.last:
-                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
-                                   99, self.S.status.iter))
-                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
-
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
@@ -328,6 +321,13 @@ class allinclusive_multigrid_MPI(controller):
                                   (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
                                    99, self.S.status.iter))
                 self.S.status.done = self.S.status.done and self.S.status.prev_done
+
+            # send status forward
+            if not self.S.status.last:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # all_done = comm.allgather(self.S.status.done)
 
@@ -339,6 +339,7 @@ class allinclusive_multigrid_MPI(controller):
                 # self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
+
                 self.hooks.pre_iteration(step=self.S, level_number=0)
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
@@ -346,6 +347,7 @@ class allinclusive_multigrid_MPI(controller):
                     self.S.status.stage = 'IT_FINE'
 
             else:
+
                 self.S.levels[0].sweep.compute_end_point()  # TODO: is this really necessary?
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
