@@ -66,7 +66,7 @@ def setup(dt):
     return description, controller_params
 
 
-def run_newton_pfasst(dt, Tend):
+def run_newton_pfasst(dt, Tend, num_procs):
 
     print('THIS IS NEWTON-PFASST....')
 
@@ -77,53 +77,72 @@ def run_newton_pfasst(dt, Tend):
     # setup parameters "in time"
     t0 = 0.0
 
-    num_procs = int((Tend - t0) / description['level_params']['dt'])
+    nsolves_all = 0
+    nsolves_step = 0
+    nsolves_iter = 0
+    
+    
+    global uk , ulast      
+    while t0 < Tend:
 
-    # instantiate the controller
-    controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params,
+
+        # instantiate the controller
+        controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                                description=description)
 
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
+        # get initial values on finest level
+        P = controller.MS[0].levels[0].prob
+        if t0==0:
+            uinit = P.u_exact(t0)
+            uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
+            controller.compute_rhs(uk, t0=t0)            
+        else:
+            uk = np.kron(np.ones(controller.nsteps * controller.nnodes), ulast)
+            controller.compute_rhs(uk, t0, u0=ulast)
 
-    uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
 
-    controller.compute_rhs(uk, t0)
-    print('  Initial residual: %8.6e' % np.linalg.norm(controller.rhs, np.inf))
-    k = 0
-    while np.linalg.norm(controller.rhs, np.inf) > description['level_params']['restol'] or k == 0:
-        k += 1
-        ek, stats = controller.run(uk=uk, t0=t0, Tend=Tend)
-        uk -= ek
-        controller.compute_rhs(uk, t0)
+        print('  Initial residual: %8.6e' % np.linalg.norm(controller.rhs, np.inf))
+    
 
-        print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e' %
-              (k, controller.inner_solve_counter, np.linalg.norm(controller.rhs, np.inf)))
+        k = 0
+        while np.linalg.norm(controller.rhs, np.inf) > description['level_params']['restol'] or k == 0:
+            k += 1
+            
+            print('#### Setup t0 %4.2f, dt %4.2f, tend %4.2f' %
+                (t0, dt, t0+dt*num_procs))
+            
+            if t0==0:
+                ek, stats = controller.run(uk=uk, t0=t0, Tend=t0+dt*num_procs)
+            else:
+                ek, stats = controller.run(uk=uk, t0=t0, Tend=t0+dt*num_procs, u0=ulast)
+            uk -= ek
+            
+            if t0==0:
+                controller.compute_rhs(uk, t0)
+            else:
+                controller.compute_rhs(uk, t0, u0=ulast)
 
-    # compute and print statistics
-    nsolves_all = controller.inner_solve_counter
-    nsolves_step = nsolves_all / num_procs
-    nsolves_iter = nsolves_all / k
-    print('  --> Number of outer iterations: %i' % k)
-    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
-          (nsolves_all, nsolves_iter, nsolves_step))
+            print('t0 %4.2f, dt %4.2f, tend %4.2f,  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e' %
+                (t0, dt, t0+dt*num_procs, k, controller.inner_solve_counter, np.linalg.norm(controller.rhs, np.inf)))
+        
+        end =  num_procs*128*3
+        start = end-128
+        ulast = uk[start:end]
+        
+        t0 += dt*num_procs
+
+        # compute and print statistics
+        nsolves_all = controller.inner_solve_counter
+        nsolves_step = nsolves_all / num_procs
+        nsolves_iter = nsolves_all / k
+        print('  --> Number of outer iterations: %i' % k)
+        print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
+            (nsolves_all, nsolves_iter, nsolves_step))
 
     fname = 'data/AC_reference_newton_pfasst.npz'
     loaded = np.load(fname)
     uref = loaded['uend']
-    
-    ### find out how to convert mesh and float this is an ugly step :(
-    #fname = 'data/newton_pfasst.npz'
-    #np.savez_compressed(file=fname, uend=uk)
-    
-    #fname = 'data/newton_pfasst.npz'
-    #loaded = np.load(fname)
-    #unew = loaded['uend']
-    ###
-    
-    #[256:384]
-    #[3840-128:3840]
+   
     end = num_procs*128*3
     start = end-128
     udiff = uk[start:end]-uref
@@ -141,7 +160,7 @@ def run_newton_pfasst(dt, Tend):
     # setup parameters "in time"
     t0 = 0.0
 
-    num_procs = int((Tend - t0) / description['level_params']['dt'])
+    #num_procs = int((Tend - t0) / description['level_params']['dt'])
 
     controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                                description=description)
@@ -195,15 +214,11 @@ def run_newton_pfasst(dt, Tend):
 
 def main():
 
-    # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
-    #num_procs = 4
-    #Tend = num_procs * 0.001
-    #dt = 1E-04
 
-    numbers = [0.1,0.05,0.025,0.0125]
+    numbers = [0.2,0.1,0.05] 
     for dt in numbers:
-        Tend = 0.1 #num_procs * dt
-        run_newton_pfasst(dt=dt, Tend=Tend)
+        Tend = 0.8 
+        run_newton_pfasst(dt=dt, Tend=Tend, num_procs=4)
 
 
 if __name__ == "__main__":

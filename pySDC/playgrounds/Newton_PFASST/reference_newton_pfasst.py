@@ -17,7 +17,7 @@ def setup():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-04  
+    level_params['dt'] = 0.0125 #1E-04  
     level_params['nsweeps'] = [1, 1]
 
     # This comes as read-in for the step class (this is optional!)
@@ -116,7 +116,7 @@ def main():
 
     # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
 
-    Tend = 0.1
+    Tend = 0.8
 
 
     run_pfasst_newton(Tend=Tend)

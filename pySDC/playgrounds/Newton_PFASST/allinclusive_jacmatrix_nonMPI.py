@@ -87,11 +87,24 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.iter_counter = None
         self.inner_solve_counter = None
 
-    def compute_rhs(self, uk, t0):
+    def compute_rhs(self, uk, t0, u0=None):
 
-        u0 = self.MS[0].levels[0].prob.u_exact(t0)
-
-        u0_full = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values))
+	if t0==0:
+            u0 = self.MS[0].levels[0].prob.u_exact(t0)
+            #print('  u0 size %i' % len(u0.values))
+            u0_full = np.kron( np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values) )  
+            #print('  u0_full size %i' % len(u0_full))          
+        else:
+            #m=0
+            #num_procs = len(self.MS)
+            #global u0_full
+            #while m< num_procs*self.nnodes:
+                #p1=len(u0)-m
+                #p2=len(u0)
+                #u0_full[m:len(u0)] = u0[0:len(u0)]
+                #m+=len(u0)
+            
+            u0_full = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0))
 
         self.rhs = uk - u0_full
 
@@ -118,6 +131,10 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                 L.f[m] = P.eval_f(L.u[m], time + L.dt * L.sweep.coll.nodes[m - 1])
             integral = L.sweep.integrate()
             self.rhs[first:last] -= np.concatenate([integral[m].values for m in range(self.nnodes)])
+
+
+
+
 
     def compute_matrices(self):
 
@@ -183,7 +200,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                       np.kron(Ec, np.kron(Nc, np.eye(nspace_c)))
             self.Pc = np.array(self.Pc)
 
-    def run(self, uk, t0, Tend):
+    def run(self, uk, t0, Tend, u0=None):
         """
         Main driver for running the serial matrix version of SDC, MSSDC, MLSDC and PFASST
 
@@ -204,10 +221,17 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.iter_counter = 0
         self.inner_solve_counter = 0
 
-        assert ((Tend - t0) / self.dt).is_integer(), \
-            'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'
 
-        assert int((Tend - t0) / self.dt) % num_procs == 0, 'ERROR: num_procs not chosen correctly'
+	###
+	# the following asserts do not work correct if parameters are to small flouting point operations can not be integer!!!!
+	###
+
+	#print(' is integer: %8.6e %i' % (((Tend - t0) / self.dt), ((Tend - t0) / self.dt).is_integer()))
+	
+        #assert ((Tend - t0) / self.dt).is_integer(), \
+            #'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'
+
+        #assert int((Tend - t0) / self.dt) % num_procs == 0, 'ERROR: num_procs not chosen correctly'
 
         slots = [p for p in range(num_procs)]
 
@@ -222,7 +246,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                     lvl.u[m] = P.dtype_u(init=P.init, val=0)
                     lvl.f[m] = P.dtype_f(init=P.init, val=0)
 
-        self.compute_rhs(uk, t0)
+        self.compute_rhs(uk, t0, u0)    
         self.compute_matrices()
 
         self.u = np.zeros(self.nsteps * self.nnodes * self.nspace)
@@ -231,8 +255,9 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
 
-        nblocks = int((Tend - t0) / self.dt / num_procs)
+        nblocks = 1 #int((Tend - t0) / self.dt / num_procs)
 
+        #print(' nblocks: %8.6e %i' % ((Tend - t0) / self.dt / num_procs, nblocks))
         assert nblocks == 1, 'ERROR: only one block of PFASST allowed'
 
         self.MS, self.u = self.pfasst(self.MS)
