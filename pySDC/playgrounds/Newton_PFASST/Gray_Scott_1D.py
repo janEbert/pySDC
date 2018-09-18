@@ -15,6 +15,7 @@ from pySDC.playgrounds.Newton_PFASST.pfasst_newton_output import output
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
+import matplotlib.pyplot as plt
 
 def setup(dt):
     # initialize level parameters
@@ -25,23 +26,30 @@ def setup(dt):
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 100
 
     # This comes as read-in for the problem class
     problem_params = dict()
+    
     problem_params['nvars'] = [256, 128]
-        
-    problem_params['Du'] = 2 #1.0
-    problem_params['Dv'] = 2 #0.01
-    problem_params['A'] = 0.09
-    problem_params['B'] = 0.086
+     
+    #F=0.018, k=0.047    
+    problem_params['Du'] = 1.0
+    problem_params['Dv'] = 0.01
+    problem_params['f'] = 0.09
+    problem_params['k'] = 0.086
     
-    problem_params['nu'] = 2 #allen
-    problem_params['eps'] = 0.04 #allen
+    #problem_params['Du'] = 1.0
+    #problem_params['Dv'] = 1.0
+    #problem_params['f'] = 0.018
+    #problem_params['k'] = 0.047
+    
+    #problem_params['nu'] = 2 #allen
+    #problem_params['eps'] = 0.04 #allen
     
     
-    problem_params['inner_maxiter'] = 1
-    problem_params['inner_tol'] = 1E-09
+    problem_params['inner_maxiter'] = 100
+    problem_params['inner_tol'] = 1E-12
     problem_params['radius'] = 0.25
 
     # This comes as read-in for the sweeper class
@@ -79,6 +87,62 @@ def setup(dt):
 
 def run_newton_pfasst(dt, Tend, num_procs):
 
+
+    print('THIS IS PFASST-NEWTON....')
+
+    description, controller_params = setup(dt=dt)
+
+    # remove this line to reduce the output of PFASST
+    #controller_params['hook_class'] = output
+
+    # setup parameters "in time"
+    t0 = 0.0
+
+    #num_procs = int((Tend - t0) / description['level_params']['dt'])
+
+    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                               description=description)
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    print(uinit.values)
+
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    print(uend.values)
+    # filter statistics by variant (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # get maximum number of iterations
+    niter = max([item[1] for item in iter_counts])
+
+    # compute and print statistics
+    nsolves_all = int(np.sum([S.levels[0].prob.inner_solve_counter for S in controller.MS]))
+    nsolves_step = nsolves_all / num_procs
+    nsolves_iter = nsolves_all / niter
+    print('  --> Number of outer iterations: %i' % niter)
+    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
+          (nsolves_all, nsolves_iter, nsolves_step))
+
+
+    end2 =  num_procs*256*3
+    start2 = end2-256
+
+    print(uend.values)
+    plt.plot(uend.values)
+    plt.show()
+    plt.savefig('my_figure.png')
+
+    
+
+
+    print() 
+
+
     print('THIS IS NEWTON-PFASST....')
 
     description, controller_params = setup(dt=dt)
@@ -112,10 +176,13 @@ def run_newton_pfasst(dt, Tend, num_procs):
             controller.compute_rhs(uk, t0, u0=ulast)
 
 
+        
         print('  Initial residual: %8.6e' % np.linalg.norm(controller.rhs, np.inf))
-    
+ 
 
         k = 0
+        
+        
         while np.linalg.norm(controller.rhs, np.inf) > description['level_params']['restol'] or k == 0:
             k += 1
             
@@ -138,7 +205,12 @@ def run_newton_pfasst(dt, Tend, num_procs):
         
         end =  num_procs*256*3-128
         start = end-128
-        ulast = uk[start:end]
+        
+        end2 =  num_procs*256*3
+        start2 = end2-256
+        
+        ulast = uk[start2:end2]
+        
         
         t0 += dt*num_procs
 
@@ -149,78 +221,14 @@ def run_newton_pfasst(dt, Tend, num_procs):
         print('  --> Number of outer iterations: %i' % k)
         print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
             (nsolves_all, nsolves_iter, nsolves_step))
-
-    fname = 'data/AC_reference_newton_pfasst.npz'
-    loaded = np.load(fname)
-    uref = loaded['uend']
    
-    #end = num_procs*256*3
-    udiff = uk[start:end]-uref
-    print(uk[start:end])
-    print(uref)
-    out   = max(abs(udiff))
-    print('  --> Difference between u and u_ref: %4.10f' %out )
+
+  
+ 
     print()    
 
-    print('THIS IS PFASST-NEWTON....')
+   
 
-    description, controller_params = setup(dt=dt)
-
-    # remove this line to reduce the output of PFASST
-    #controller_params['hook_class'] = output
-
-    # setup parameters "in time"
-    t0 = 0.0
-
-    #num_procs = int((Tend - t0) / description['level_params']['dt'])
-
-    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                               description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    print('vor run')
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    print('nach run')
-    # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
-
-    # get maximum number of iterations
-    niter = max([item[1] for item in iter_counts])
-
-    # compute and print statistics
-    nsolves_all = int(np.sum([S.levels[0].prob.inner_solve_counter for S in controller.MS]))
-    nsolves_step = nsolves_all / num_procs
-    nsolves_iter = nsolves_all / niter
-    print('  --> Number of outer iterations: %i' % niter)
-    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
-          (nsolves_all, nsolves_iter, nsolves_step))
-
-    fname = 'data/AC_reference_newton_pfasst.npz'
-    loaded = np.load(fname)
-    uref = loaded['uend']
-    
-    ### find out how to convert mesh and float this is an ugly step :(
-    fname = 'data/newton_pfasst.npz'
-    np.savez_compressed(file=fname, uend=uend.values)
-    
-    fname = 'data/newton_pfasst.npz'
-    loaded = np.load(fname)
-    unew = loaded['uend']
-    ###
-    
-    #udiff = unew-uref
-    #out   = max(udiff)
-    #print('  --> Difference between u and u_ref: %4.10f' %out )
-
-    print()    
-    #fname = 'data/convergence_plot_dt'.format(1E-4) +'andbiggersteps.npz'
-    #np.savez_compressed(file=fname, dt=dt, udiff=udiff)
 
 
 
@@ -228,9 +236,9 @@ def run_newton_pfasst(dt, Tend, num_procs):
 def main():
 
 
-    numbers = [0.2,0.1,0.05] 
+    numbers = [2.0] 
     for dt in numbers:
-        Tend = 0.8 
+        Tend = 8.0
         run_newton_pfasst(dt=dt, Tend=Tend, num_procs=4)
 
 

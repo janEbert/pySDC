@@ -7,6 +7,7 @@ from scipy.sparse.linalg import cg, spsolve
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
+
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
@@ -31,7 +32,7 @@ class grayscott_fullyimplicit(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'Du', 'Dv', 'A', 'B', 'inner_maxiter', 'inner_tol'] #gray
+        essential_keys = ['nvars', 'Du', 'Dv', 'f', 'k', 'inner_maxiter', 'inner_tol'] #gray
         
         #essential_keys = ['nvars', 'nu', 'eps', 'inner_maxiter', 'inner_tol', 'radius'] #allen
         for key in essential_keys:
@@ -49,13 +50,14 @@ class grayscott_fullyimplicit(ptype):
         super(grayscott_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 2.0 / self.params.nvars
+        self.dx = 200.0 / self.params.nvars
         #self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
         self.A = self.__get_A(self.params.nvars, self.params.Du, self.params.Dv, self.dx)
-        self.xvalues = np.append( np.array([i * self.dx - 0.5 for i in range(int(self.params.nvars/2.))]), np.array([i * self.dx - 0.5 for i in range(int(self.params.nvars/2.))])) 
+        
+        self.xvalues = np.append( np.array([i * self.dx for i in range(int(self.params.nvars/2.))]), np.array([i * self.dx for i in range(int(self.params.nvars/2.))])) 
 
 	#print(self.xvalues)
-
+	#exit()
         self.inner_solve_counter = 0
         self.newton_ncalls = 0
 
@@ -73,53 +75,40 @@ class grayscott_fullyimplicit(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
         
-        stencil = [1, -2, 1]
-        zero_pos = 2
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        
-        
-        offsets = np.concatenate(([N - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
-                                  
-                                  
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
-        
-	
+       
+        values_d = np.array([-2.0,-2.0])    #diogonal elements  
+        values_nd = np.array([1.0])       #lower and upper diagonal elements 
+        values_periodic = np.array([1.0]) #additional elements because of periodic boundarys
 
-        A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-
-
-
-        values_nd = np.array([1])
-        values_d = np.array([-2,-2])
-        
-        values_periodic_left = np.array([1])
-        values_periodic_right = np.array([0])
 
 	for i in range(N-2):
-	    values_nd = np.append(values_nd, [1])
-	    values_d = np.append(values_d, [-2])
+	    values_nd = np.append(values_nd, [1.0])
+	    values_d = np.append(values_d, [-2.0])
 	
 	for i in range(int(N/2)):
-	    values_periodic_left = np.append(values_periodic_left, [0])
+	    values_periodic = np.append(values_periodic, [0.0])
 	    
 	
-	values_periodic_left[int(N/2)]=1
-	values_nd[int(N/2-1)]=0
+	values_periodic[int(N/2)]=1.0
+	values_nd[int(N/2-1)]=0.0
+	
+	values_d[0:int(N/2)] *= Du
+	values_d[int(N/2+1):N] *=Dv
+	 
+	values_periodic[0:int(N/2)] *= Du
+	values_periodic[int(N/2+1):N] *= Dv
+	
+	values_nd[0:int(N/2)] *= Du
+	values_nd[int(N/2+1):N] *= Dv		
+	
+	B = sp.diags([values_periodic, values_nd, values_d, values_nd, values_periodic], [-int(N/2-1),-1, 0, 1, int(N/2-1)])    
 
-	B = sp.diags([values_periodic_left, values_nd, values_d, values_nd, values_periodic_left], [-int(N/2-1),-1, 0, 1, int(N/2-1)])    
-
-        #print('matrix a %i' %A.size)
-        #print(A.todense())
-        #print('matrix b %i' %B.size)
-        #print(B.todense())
-       
-      
-
+   
         
-        A *= Du / (dx ** 2)
-        B *= Du / (dx ** 2)
-
+        B *= 1.0 / (dx ** 2)
+        #print('Laplace')
+        #print(B.todense())
+        #exit() 
         return B
 
     # noinspection PyTypeChecker
@@ -136,22 +125,25 @@ class grayscott_fullyimplicit(ptype):
         Returns:
             dtype_u: solution u
         """
+	#just for PFASST_Newton
 
         me = self.dtype_u(self.init)
 
         me.values[:] = u0.values
-        nu = self.params.nu
-        eps2 = self.params.eps ** 2
+        #nu = self.params.nu
+        #eps2 = self.params.eps ** 2
 
         Id = sp.eye(self.params.nvars)
 
         # start newton iteration
         n = 0
         res = 99
+        
+        
         while n < self.params.inner_maxiter:
 
             # form the function g with g(u) = 0
-            g = me.values - factor * (self.A.dot(me.values) + 1.0 / eps2 * me.values * (1.0 - me.values ** nu))\
+            g = me.values - factor * self.eval_f(me,0).values\
                 - rhs.values
 
             # if g is close to 0, then we are done
@@ -161,7 +153,7 @@ class grayscott_fullyimplicit(ptype):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * me.values ** nu), offsets=0))
+            dg = Id - factor * self.eval_jacobian(me)
 
             # newton update: u1 = u0 - g/dg
             me.values -= spsolve(dg, g)
@@ -188,9 +180,18 @@ class grayscott_fullyimplicit(ptype):
         Returns:
             dtype_f: the RHS
         """
+        
+        N=self.params.nvars
+                
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values) 
-        f.values += 1.0 / self.params.eps ** 2 * u.values * (1.0 - u.values ** self.params.nu)
+
+	f.values[0:int(N/2)]  = - u.values[0:int(N/2)] * u.values[int(N/2):N]**2 +  self.params.f * (1.0 - u.values[0:int(N/2)])
+	f.values[int(N/2):N]  =   u.values[0:int(N/2)] * u.values[int(N/2):N]**2 - (self.params.f + self.params.k) * u.values[int(N/2):N]
+	
+	f.values += self.A.dot(u.values)
+	
+	#print('f')
+	#print(f.values)
 
         return f
 
@@ -206,8 +207,13 @@ class grayscott_fullyimplicit(ptype):
         """
 
         # noinspection PyTypeChecker
-        dfdu = self.A + sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values ** self.params.nu),
-                                 offsets=0)
+        
+        N=self.params.nvars      
+        
+        
+        dfdu =  self.A + sp.diags( [u.values[int(N/2):N]**2  , np.append(-u.values[int(N/2):N]**2 - 1.0 * self.params.f,  2.0* u.values[0:int(N/2)] * u.values[int(N/2):N] -1.0 *(self.params.f +self.params.k)), -2*u.values[0:int(N/2)] * u.values[int(N/2):N]]     , [-int(N/2), 0, int(N/2)])
+             
+               
                                  
         #print('jac')
         #print(dfdu.todense())                         
@@ -226,13 +232,31 @@ class grayscott_fullyimplicit(ptype):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
-        for i in range(int(self.params.nvars)):
-            #me.values[i] = 1 - 0.5 * np.power(np.sin(np.pi * self.xvalues[i] / 100), 100)
-            #me.values[int(i+(self.params.nvars/2))] = 0.25 * np.power(np.sin(np.pi * self.xvalues[i] / 100), 100)
-            
-            me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
+        for i in range(int(self.params.nvars/2)):
+            #print(i)
+            me.values[i] = 1 - 0.5 * np.power(np.sin(np.pi * self.xvalues[i] / 100), 100)
+            me.values[int(i+(self.params.nvars/2))] = 0.25 * np.power(np.sin(np.pi * self.xvalues[i] / 100), 100)
 
-            
+        #print('anfangswert')    
         #print(me.values)
+        
+        
+        #self.eval_jacobian(me)
+        
+        
+        #eps =0.000001
+        #me_right = self.dtype_u(self.init, val=me.values+eps)
+        
+        #me_1 = self.dtype_u(self.init, val=eps)
+
+   
+        
+        
+        #print(self.eval_f(me,0).values - self.eval_f(me_right,0).values   + self.eval_jacobian(me_right).dot(me_1.values))  
+        #print(max(self.eval_f(me,0).values - self.eval_f(me_right,0).values   + self.eval_jacobian(me_right).dot(me_1.values))) 
 	#exit()    
+	
+	
+	
+	
         return me
