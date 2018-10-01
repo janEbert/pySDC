@@ -108,9 +108,10 @@ def run_pfasst_newton(Tend=None):
     print()
     
     fname = 'data/AC_reference_newton_pfasst.npz' 
+    
     np.savez_compressed(file=fname, uend=uend.values)
 
-
+    print
 
 def main():
 

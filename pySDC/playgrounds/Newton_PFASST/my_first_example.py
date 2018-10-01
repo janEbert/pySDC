@@ -27,8 +27,9 @@ def setup(dt):
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [128, 64]
-    problem_params['eps'] = 0.04
+    problem_params['nvars'] = [256, 128]
+    problem_params['eps'] = 1#0.04
+    problem_params['lambda0'] = 1#0.04    
     problem_params['inner_maxiter'] = 1
     problem_params['inner_tol'] = 1E-09
     problem_params['radius'] = 0.25
@@ -145,7 +146,7 @@ def run_newton_pfasst(dt, Tend, num_procs):
    
     end = num_procs*128*3
     start = end-128
-    udiff = uk[start:end]-uref
+    udiff = uk[start:end]- P.u_exact(Tend).values#uref
     out   = max(udiff)
     print('  --> Difference between u and u_ref: %4.10f' %out )
     print()    
@@ -201,7 +202,7 @@ def run_newton_pfasst(dt, Tend, num_procs):
     unew = loaded['uend']
     ###
     
-    udiff = unew-uref
+    udiff = unew- P.u_exact(Tend).values #uref
     out   = max(udiff)
     print('  --> Difference between u and u_ref: %4.10f' %out )
 

@@ -176,9 +176,19 @@ class allencahn_fullyimplicit(ptype):
             dtype_u: exact solution
         """
 
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
-        me = self.dtype_u(self.init, val=0.0)
-        for i in range(self.params.nvars):
-            me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
+        me = self.dtype_u(self.init)
+        xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
+
+        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
+        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        
+        me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+                     np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+
+
+        #assert t == 0, 'ERROR: u_exact only valid for t=0'
+        #me = self.dtype_u(self.init, val=0.0)
+        #for i in range(self.params.nvars):
+            #me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
 
         return me

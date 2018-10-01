@@ -190,6 +190,7 @@ class grayscott_fullyimplicit(ptype):
 	
 	f.values += self.A.dot(u.values)
 	
+	#f.values*=-1
 	#print('f')
 	#print(f.values)
 
