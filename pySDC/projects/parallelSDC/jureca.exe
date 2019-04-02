@@ -1,0 +1,14 @@
+#!/bin/bash -x
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=24
+#SBATCH --output=Qpfasster96.out
+#SBATCH --error=Qpfasster96.err
+#SBATCH --time=00:05:00
+#SBATCH --partition=batch
+
+export LD_PRELOAD=$EBROOTIMKL/mkl/lib/intel64/libmkl_def.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_avx2.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_core.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_lp64.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_thread.so:$EBROOTIMKL/lib/intel64/libiomp5.so
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+srun --cpu_bind=sockets --distribution=block:block python run_parallel.py
+
