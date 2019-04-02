@@ -1,15 +1,14 @@
 import sys
-from mpi4py import MPI
-import numpy as np
 
-from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+import numpy as np
+from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.125
-    level_params['nsweeps'] = [1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -61,9 +60,10 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(129, 129), (65, 65)]  # number of degrees of freedom for each level
+    problem_params['cnvars'] = [(129, 129)]  # number of degrees of freedom on coarse level
+    problem_params['refine'] = [1, 0]  # number of refinements
     problem_params['comm'] = space_comm  # pass space-communicator to problem class
-    problem_params['sol_tol'] = 1E-12  # set tolerance to PETSc' linear solver
+    problem_params['sol_tol'] = 1E-10  # set tolerance to PETSc' linear solver
 
     # initialize step parameters
     step_params = dict()
@@ -77,16 +77,13 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
+    controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
     controller_params['dump_setup'] = False
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heat2d_petsc_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = petsc_data  # pass PETSc data type for u
-    description['dtype_f'] = rhs_imex_petsc_data  # pass PETSc data type for f
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -99,7 +96,7 @@ def main():
     Tend = 3.0
 
     # instantiate controller
-    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob
@@ -140,6 +137,9 @@ def main():
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
+
+        print('   Iteration count linear solver: %i' % P.ksp_itercount)
+        print('   Mean Iteration count per call: %4.2f' % (P.ksp_itercount / max(P.ksp_ncalls, 1)))
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 

@@ -1,9 +1,10 @@
 import logging
-import scipy.sparse as sp
-import numpy as np
 
-from pySDC.helpers.pysdc_helper import FrozenClass
+import numpy as np
+import scipy.sparse as sp
+
 from pySDC.core.Errors import UnlockError
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
@@ -155,7 +156,7 @@ class base_transfer(object):
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
 
-        if F.tau is not None:
+        if F.tau[0] is not None:
             # restrict possible tau correction from fine in space
             tmp_tau = []
             for m in range(SF.coll.num_nodes):
@@ -169,7 +170,7 @@ class base_transfer(object):
             pass
 
         # save u and rhs evaluations for interpolation
-        for m in range(SG.coll.num_nodes + 1):
+        for m in range(1, SG.coll.num_nodes + 1):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
 
@@ -201,24 +202,17 @@ class base_transfer(object):
 
         # build coarse correction
 
-        # we need to update u0 here for the predictor step, since here the new values for the fine sweep are not
-        # received from the previous processor but interpolated from the coarse level.
-        # need to restrict F.u[0] again here, since it might have changed in PFASST
-        G.uold[0] = self.space_transfer.restrict(F.u[0])
-
         # interpolate values in space first
-        tmp_u = [self.space_transfer.prolong(G.u[0] - G.uold[0])]
+        tmp_u = []
         for m in range(1, SG.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
 
         # interpolate values in collocation
-        F.u[0] += tmp_u[0]
         for n in range(1, SF.coll.num_nodes + 1):
-            for m in range(1, SG.coll.num_nodes + 1):
-                F.u[n] += self.Pcoll[n - 1, m - 1] * tmp_u[m]
+            for m in range(SG.coll.num_nodes):
+                F.u[n] += self.Pcoll[n - 1, m] * tmp_u[m]
 
         # re-evaluate f on fine level
-        F.f[0] = PF.eval_f(F.u[0], F.time)
         for m in range(1, SF.coll.num_nodes + 1):
             F.f[m] = PF.eval_f(F.u[m], F.time + F.dt * SF.coll.nodes[m - 1])
 
@@ -236,8 +230,6 @@ class base_transfer(object):
         F = self.fine
         G = self.coarse
 
-        PG = G.prob
-
         SF = F.sweep
         SG = G.sweep
 
@@ -246,23 +238,18 @@ class base_transfer(object):
             raise UnlockError('coarse level is still locked, cannot use data from there')
 
         # build coarse correction
-        # need to restrict F.u[0] again here, since it might have changed in PFASST
-        G.uold[0] = self.space_transfer.restrict(F.u[0])
-        G.fold[0] = PG.eval_f(G.uold[0], G.time)
 
         # interpolate values in space first
-        tmp_u = [self.space_transfer.prolong(G.u[0] - G.uold[0])]
-        tmp_f = [self.space_transfer.prolong(G.f[0] - G.fold[0])]
+        tmp_u = []
+        tmp_f = []
         for m in range(1, SG.coll.num_nodes + 1):
             tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
             tmp_f.append(self.space_transfer.prolong(G.f[m] - G.fold[m]))
 
         # interpolate values in collocation
-        F.u[0] += tmp_u[0]
-        F.f[0] += tmp_f[0]
         for n in range(1, SF.coll.num_nodes + 1):
-            for m in range(1, SG.coll.num_nodes + 1):
-                F.u[n] += self.Pcoll[n - 1, m - 1] * tmp_u[m]
-                F.f[n] += self.Pcoll[n - 1, m - 1] * tmp_f[m]
+            for m in range(SG.coll.num_nodes):
+                F.u[n] += self.Pcoll[n - 1, m] * tmp_u[m]
+                F.f[n] += self.Pcoll[n - 1, m] * tmp_f[m]
 
         return None

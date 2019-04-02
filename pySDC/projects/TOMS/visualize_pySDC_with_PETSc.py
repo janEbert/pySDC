@@ -1,8 +1,9 @@
-import pySDC.helpers.plot_helper as plt_helper
-
 import os
-import numpy as np
+
 import matplotlib.colors as colors
+import numpy as np
+
+import pySDC.helpers.plot_helper as plt_helper
 
 
 def is_number(s):
@@ -97,7 +98,8 @@ def visualize_matrix(result=None):
     plt_helper.newfig(textwidth=120, scale=1.5)
     cmap = plt_helper.plt.get_cmap('RdYlGn_r')
     new_cmap = truncate_colormap(cmap, 0.1, 0.9)
-    plt_helper.plt.imshow(mat, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto')
+    plt_helper.plt.imshow(mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap,
+                          aspect='auto')
 
     for key, item in result.items():
         timing = "{:3.1f}".format(item)
@@ -168,16 +170,17 @@ def main(cwd=''):
 
     """
     result = {}
-    files = ['data/result_MLSDC.dat', 'data/result_PFASST_2.dat', 'data/result_PFASST_4.dat',
-             'data/result_PFASST_6.dat', 'data/result_PFASST_12.dat', 'data/result_PFASST_24.dat']
+    files = ['data/result_PFASST_1_NEW.dat', 'data/result_PFASST_2_NEW.dat', 'data/result_PFASST_4_NEW.dat',
+             'data/result_PFASST_6_NEW.dat', 'data/result_PFASST_12_NEW.dat', 'data/result_PFASST_24_NEW.dat']
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
     visualize_matrix(result=result)
 
     result = {}
-    files = ['data/result_MLSDC.dat', 'data/result_PFASST_multinode_24.dat']
+    files = ['data/result_MLSDC_NEW.dat', 'data/result_PFASST_multinode_24_NEW.dat']
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
+    # result.pop((24, 24))
     visualize_speedup(result=result)
 
 

@@ -1,9 +1,9 @@
 import logging
 
 from pySDC.core import Level as levclass
-from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.core.Errors import ParameterError
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
@@ -26,6 +26,7 @@ class _Status(FrozenClass):
         self.last = None
         self.pred_cnt = None
         self.done = None
+        self.force_done = None
         self.prev_done = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
@@ -84,8 +85,15 @@ class step(FrozenClass):
             descr (dict): dictionary containing the description of the levels as list per key
         """
 
+        if 'dtype_u' in descr:
+            raise ParameterError('Deprecated parameter dtype_u, please remove from description dictionary and specify '
+                                 'directly in the problem class')
+        if 'dtype_f' in descr:
+            raise ParameterError('Deprecated parameter dtype_f, please remove from description dictionary and specify '
+                                 'directly in the problem class')
+
         # assert the existence of all the keys we need to set up at least on level
-        essential_keys = ['problem_class', 'dtype_u', 'dtype_f', 'sweeper_class', 'sweeper_params', 'level_params']
+        essential_keys = ['problem_class', 'sweeper_class', 'sweeper_params', 'level_params']
         for key in essential_keys:
             if key not in descr:
                 msg = 'need %s to instantiate step, only got %s' % (key, str(descr.keys()))
@@ -130,8 +138,6 @@ class step(FrozenClass):
 
             L = levclass.level(problem_class=descr_list[l]['problem_class'],
                                problem_params=descr_list[l]['problem_params'],
-                               dtype_u=descr_list[l]['dtype_u'],
-                               dtype_f=descr_list[l]['dtype_f'],
                                sweeper_class=descr_list[l]['sweeper_class'],
                                sweeper_params=descr_list[l]['sweeper_params'],
                                level_params=descr_list[l]['level_params'],

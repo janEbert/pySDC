@@ -1,10 +1,9 @@
-from __future__ import division
 import numpy as np
-
 import pyfftw
 
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -14,19 +13,20 @@ class allencahn2d_imex(ptype):
 
     Attributes:
         xvalues: grid points in space
+        dx: mesh width
         lap: spectral operator for Laplacian
-        fft_object: planned FFT for forward transformation
-        ifft_object: planned IFFT for backward transformation
+        rfft_object: planned real FFT for forward transformation
+        irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         if 'L' not in problem_params:
@@ -53,32 +53,26 @@ class allencahn2d_imex(ptype):
         super(allencahn2d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
-        dx = self.params.L / self.params.nvars[0]
-        self.xvalues = np.array([i * dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
+        self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
+        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
 
         kx = np.zeros(self.init[0])
-        ky = np.zeros(self.init[1])
-        for i in range(0, int(self.init[0] / 2) + 1):
-            kx[i] = 2 * np.pi / self.params.L * i
-        for i in range(0, int(self.init[1] / 2) + 1):
-            ky[i] = 2 * np.pi / self.params.L * i
-        for i in range(int(self.init[0] / 2) + 1, self.init[0]):
-            kx[i] = 2 * np.pi / self.params.L * (-self.init[0] + i)
-        for i in range(int(self.init[1] / 2) + 1, self.init[1]):
-            ky[i] = 2 * np.pi / self.params.L * (-self.init[1] + i)
+        ky = np.zeros(self.init[1] // 2 + 1)
 
-        self.lap = np.zeros(self.init)
-        for i in range(self.init[0]):
-            for j in range(self.init[1]):
-                self.lap[i, j] = -kx[i] ** 2 - ky[j] ** 2
+        kx[:int(self.init[0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(self.init[0] / 2) + 1)
+        kx[int(self.init[0] / 2) + 1:] = 2 * np.pi / self.params.L * \
+            np.arange(int(self.init[0] / 2) + 1 - self.init[0], 0)
+        ky[:] = 2 * np.pi / self.params.L * np.arange(0, self.init[1] // 2 + 1)
 
-        # TODO: cleanup and move to real-valued FFT
-        fft_in = pyfftw.empty_aligned(self.init, dtype='complex128')
-        fft_out = pyfftw.empty_aligned(self.init, dtype='complex128')
-        ifft_in = pyfftw.empty_aligned(self.init, dtype='complex128')
-        ifft_out = pyfftw.empty_aligned(self.init, dtype='complex128')
-        self.fft_object = pyfftw.FFTW(fft_in, fft_out, direction='FFTW_FORWARD', axes=(0, 1))
-        self.ifft_object = pyfftw.FFTW(ifft_in, ifft_out, direction='FFTW_BACKWARD', axes=(0, 1))
+        xv, yv = np.meshgrid(kx, ky, indexing='ij')
+        self.lap = -xv ** 2 - yv ** 2
+
+        rfft_in = pyfftw.empty_aligned(self.init, dtype='float64')
+        fft_out = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
+        ifft_in = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
+        irfft_out = pyfftw.empty_aligned(self.init, dtype='float64')
+        self.rfft_object = pyfftw.FFTW(rfft_in, fft_out, direction='FFTW_FORWARD', axes=(0, 1))
+        self.irfft_object = pyfftw.FFTW(ifft_in, irfft_out, direction='FFTW_BACKWARD', axes=(0, 1))
 
     def eval_f(self, u, t):
         """
@@ -94,8 +88,8 @@ class allencahn2d_imex(ptype):
 
         f = self.dtype_f(self.init)
         v = u.values.flatten()
-        tmp = self.lap * self.fft_object(u.values)
-        f.impl.values[:] = np.real(self.ifft_object(tmp))
+        tmp = self.lap * self.rfft_object(u.values)
+        f.impl.values[:] = self.irfft_object(tmp)
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
             f.expl.values = f.expl.values.reshape(self.params.nvars)
@@ -117,8 +111,8 @@ class allencahn2d_imex(ptype):
 
         me = self.dtype_u(self.init)
 
-        tmp = self.fft_object(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = np.real(self.ifft_object(tmp))
+        tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
+        me.values[:] = self.irfft_object(tmp)
 
         return me
 
@@ -136,10 +130,9 @@ class allencahn2d_imex(ptype):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            for i in range(self.params.nvars[0]):
-                for j in range(self.params.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                    me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+            xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
+            me.values[:, :] = np.tanh((self.params.radius - np.sqrt(xv ** 2 + yv ** 2)) /
+                                      (np.sqrt(2) * self.params.eps))
         elif self.params.init_type == 'checkerboard':
             xv, yv = np.meshgrid(self.xvalues, self.xvalues)
             me.values[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
@@ -147,5 +140,75 @@ class allencahn2d_imex(ptype):
             me.values[:, :] = np.random.uniform(-1, 1, self.init)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
+
+        return me
+
+
+class allencahn2d_imex_stab(allencahn2d_imex):
+    """
+    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
+    stabilized splitting
+
+    Attributes:
+        xvalues: grid points in space
+        dx: mesh width
+        lap: spectral operator for Laplacian
+        rfft_object: planned real FFT for forward transformation
+        irfft_object: planned IFFT for backward transformation
+    """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
+        """
+        super(allencahn2d_imex_stab, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
+
+        self.lap -= 2.0 / self.params.eps ** 2
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+
+        f = self.dtype_f(self.init)
+        v = u.values.flatten()
+        tmp = self.lap * self.rfft_object(u.values)
+        f.impl.values[:] = self.irfft_object(tmp)
+        if self.params.eps > 0:
+            f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) + \
+                2.0 / self.params.eps ** 2 * v
+            f.expl.values = f.expl.values.reshape(self.params.nvars)
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple FFT solver for the diffusion part
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        me = self.dtype_u(self.init)
+
+        tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
+        me.values[:] = self.irfft_object(tmp)
 
         return me

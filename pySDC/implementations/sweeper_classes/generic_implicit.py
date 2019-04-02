@@ -1,5 +1,3 @@
-import numpy as np
-
 from pySDC.core.Sweeper import sweeper
 
 
@@ -27,6 +25,7 @@ class generic_implicit(sweeper):
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+        self.newton_itercount = 0
 
     def integrate(self):
         """
@@ -77,20 +76,20 @@ class generic_implicit(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
 
             # add initial value
             integral[m] += L.u[0]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
         # do the sweep
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
@@ -128,7 +127,7 @@ class generic_implicit(sweeper):
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt * self.coll.weights[m] * L.f[m + 1]
             # add up tau correction of the full interval (last entry)
-            if L.tau is not None:
+            if L.tau[-1] is not None:
                 L.uend += L.tau[-1]
 
         return None

@@ -1,8 +1,8 @@
-from __future__ import division
-from scipy.interpolate import BarycentricInterpolator
-from scipy.integrate import quad
-import numpy as np
 import logging
+
+import numpy as np
+from scipy.integrate import quad
+from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Errors import CollocationError
 

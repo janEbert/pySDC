@@ -1,20 +1,18 @@
-import pySDC.helpers.plot_helper as plt_helper
-import matplotlib.ticker as ticker
+import os
 
 import dill
-import os
+import matplotlib.ticker as ticker
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+import pySDC.helpers.plot_helper as plt_helper
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit, \
     allencahn_semiimplicit_v2, allencahn_multiimplicit, allencahn_multiimplicit_v2
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
 
@@ -34,14 +32,14 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1E-12
+    level_params['dt'] = 1E-04
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
+    sweeper_params['num_nodes'] = [5]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
@@ -51,12 +49,12 @@ def setup_parameters():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(256,256)] # [(128, 128)]
     problem_params['eps'] = [0.04]
-    problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-09
-    problem_params['lin_tol'] = 1E-10
-    problem_params['lin_maxiter'] = 100
+    problem_params['newton_maxiter'] = 1000
+    problem_params['newton_tol'] = 1E-13
+    problem_params['lin_tol'] = 1E-14
+    problem_params['lin_maxiter'] = 1000
     problem_params['radius'] = 0.25
 
     # initialize step parameters
@@ -72,8 +70,6 @@ def setup_parameters():
     description = dict()
     description['problem_class'] = None  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = None  # pass data type for f
     description['sweeper_class'] = None  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -101,32 +97,27 @@ def run_SDC_variant(variant=None, inexact=False):
     # add stuff based on variant
     if variant == 'fully-implicit':
         description['problem_class'] = allencahn_fullyimplicit
-        description['dtype_f'] = mesh
         description['sweeper_class'] = generic_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
     elif variant == 'semi-implicit':
         description['problem_class'] = allencahn_semiimplicit
-        description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['lin_maxiter'] = 10
     elif variant == 'semi-implicit_v2':
         description['problem_class'] = allencahn_semiimplicit_v2
-        description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
     elif variant == 'multi-implicit':
         description['problem_class'] = allencahn_multiimplicit
-        description['dtype_f'] = rhs_comp2_mesh
         description['sweeper_class'] = multi_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
             description['problem_params']['lin_maxiter'] = 10
     elif variant == 'multi-implicit_v2':
         description['problem_class'] = allencahn_multiimplicit_v2
-        description['dtype_f'] = rhs_comp2_mesh
         description['sweeper_class'] = multi_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
@@ -141,11 +132,10 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.032
+    Tend = 0.024 #32
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -154,34 +144,37 @@ def run_SDC_variant(variant=None, inexact=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+    fname = 'ref_24.npz'
+    np.savez_compressed(file=fname, uend=uend.values)
+    
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
+    #filtered_stats = filter_stats(stats, type='niter')
 
     # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    #iter_counts = sort_stats(filtered_stats, sortby='time')
 
     # compute and print statistics
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    print(out)
-    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-    print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
-    print(out)
-    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-    print(out)
+    #niters = np.array([item[1] for item in iter_counts])
+    #out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    #print(out)
+    #out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    #print(out)
+    #out = '   Position of max/min number of iterations: %2i -- %2i' % \
+    #      (int(np.argmax(niters)), int(np.argmin(niters)))
+    #print(out)
+    #out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    #print(out)
 
-    print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
-    print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
-                                                               P.lin_itercount / max(P.lin_ncalls, 1)))
+    #print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+    #print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
+    #                                                           P.lin_itercount / max(P.lin_ncalls, 1)))
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    #timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-    print('Time to solution: %6.4f sec.' % timing[0][1])
-    print()
+    #print('Time to solution: %6.4f sec.' % timing[0][1])
+    #print()
 
-    return stats
+    #return stats
 
 
 def show_results(fname, cwd=''):
@@ -221,7 +214,7 @@ def show_results(fname, cwd=''):
     ax1.set_ylabel('time (sec)')
 
     ax2 = ax1.twinx()
-    ax2.bar(xcoords, heights_niters, color='r', align='edge', width=0.3, label='iterations (right axis)')
+    ax2.bar(xcoords, heights_niters, color='lightcoral', align='edge', width=0.3, label='iterations (right axis)')
     ax2.set_ylabel('mean number of iterations')
 
     ax1.set_xticks(xcoords)
@@ -320,20 +313,20 @@ def main(cwd=''):
 
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
+    for variant in ['fully-implicit']: #'multi-implicit', 'semi-implicit', , 'semi-implicit_v2', 'multi-implicit_v2']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+        #results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
-    fname = 'data/results_SDC_variants_AllenCahn_1E-03'
-    file = open(cwd + fname + '.pkl', 'wb')
-    dill.dump(results, file)
-    file.close()
-    assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
+    #fname = 'data/results_SDC_variants_AllenCahn_1E-03'
+    #file = open(cwd + fname + '.pkl', 'wb')
+    #dill.dump(results, file)
+    #file.close()
+    #assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
-    show_results(fname, cwd=cwd)
+    #show_results(fname, cwd=cwd)
 
 
 if __name__ == "__main__":

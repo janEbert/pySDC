@@ -1,9 +1,9 @@
-from __future__ import division
 
 import numpy as np
 
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -14,14 +14,14 @@ class swfw_scalar(ptype):
     Attributes:
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         # these parameters will be used later, so assert their existence

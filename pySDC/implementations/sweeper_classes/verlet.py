@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper
@@ -103,7 +102,7 @@ class verlet(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 integral[m].pos -= L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])
                 integral[m].vel -= L.dt * self.QT[m + 1, j] * L.f[j]
 
@@ -111,14 +110,14 @@ class verlet(sweeper):
             integral[m].pos += L.u[0].pos
             integral[m].vel += L.u[0].vel
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
         # do the sweep
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             L.u[m + 1] = P.dtype_u(integral[m])
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 # add QxF(u^{k+1})
                 L.u[m + 1].pos += L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])
                 L.u[m + 1].vel += L.dt * self.QT[m + 1, j] * L.f[j]
@@ -186,7 +185,7 @@ class verlet(sweeper):
                 L.uend.m = L.u[0].m
                 L.uend.q = L.u[0].q
             # add up tau correction of the full interval (last entry)
-            if L.tau is not None:
+            if L.tau[-1] is not None:
                 L.uend += L.tau[-1]
 
         return None

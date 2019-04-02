@@ -1,11 +1,10 @@
-from __future__ import division
 
 import numpy as np
 from numba import jit
 
+from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
-from pySDC.core.Errors import ParameterError, ProblemError
 
 
 # noinspection PyUnusedLocal
@@ -14,14 +13,14 @@ class penningtrap(ptype):
     Example implementing particles in a penning trap
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=fields):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
             dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_f: fields data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -86,7 +85,7 @@ class penningtrap(ptype):
         N = self.params.nparts
 
         Emat = np.diag([1, 1, -2])
-        f = fields((3, self.params.nparts))
+        f = self.dtype_f((3, self.params.nparts))
 
         f.elec.values = self.get_interactions(part)
 
@@ -108,7 +107,7 @@ class penningtrap(ptype):
         u0 = self.params.u0
         N = self.params.nparts
 
-        u = particles((3, N))
+        u = self.dtype_u((3, N))
 
         if u0[2][0] is not 1 or u0[3][0] is not 1:
             raise ProblemError('so far only q = m = 1 is implemented')
@@ -175,7 +174,7 @@ class penningtrap(ptype):
         if N != 1:
             raise ProblemError('u_exact is only valid for a single particle')
 
-        u = particles((3, 1))
+        u = self.dtype_u((3, 1))
 
         wbar = np.sqrt(2) * wE
 

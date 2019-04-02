@@ -1,10 +1,9 @@
-from __future__ import division
 
 import numpy as np
 
-from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal
@@ -13,14 +12,14 @@ class harmonic_oscillator(ptype):
     Example implementing the harmonic oscillator
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: particle data type (will be passed to parent class)
+            dtype_f: acceleration data type (will be passed to parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -33,6 +32,11 @@ class harmonic_oscillator(ptype):
         # invoke super init, passing nparts, dtype_u and dtype_f
         super(harmonic_oscillator, self).__init__(1, dtype_u, dtype_f, problem_params)
 
+        if self.params.phase != 0.0:
+            raise ProblemError('Phase != 0 not implemented yet')
+        if self.params.amp != 1.0:
+            raise ProblemError('amp != 1 not implemented yet')
+
     def eval_f(self, u, t):
         """
         Routine to compute the RHS
@@ -43,7 +47,7 @@ class harmonic_oscillator(ptype):
         Returns:
             dtype_f: RHS
         """
-        me = acceleration(1)
+        me = self.dtype_f(1)
         me.values[:] = -self.params.k * u.pos.values
         return me
 
@@ -57,7 +61,7 @@ class harmonic_oscillator(ptype):
             dtype_u: exact position and velocity
         """
 
-        me = particles(1)
+        me = self.dtype_u(1)
         me.pos.values[:] = self.params.amp * np.cos(np.sqrt(self.params.k) * t + self.params.phase)
         me.vel.values[:] = -self.params.amp * np.sqrt(self.params.k) * np.sin(np.sqrt(self.params.k) * t +
                                                                               self.params.phase)

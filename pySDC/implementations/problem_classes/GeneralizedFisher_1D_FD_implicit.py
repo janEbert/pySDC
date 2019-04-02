@@ -1,11 +1,11 @@
-from __future__ import division
 
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
@@ -18,7 +18,7 @@ class generalized_fisher(ptype):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 
@@ -39,12 +39,16 @@ class generalized_fisher(ptype):
         if (problem_params['nvars'] + 1) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p - 1')
 
+        if 'stop_at_nan' not in problem_params:
+            problem_params['stop_at_nan'] = True
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(generalized_fisher, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
+        self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1.)
         self.A = self.__get_A(self.params.nvars, self.dx)
+        self.newton_itercount = 0
 
     @staticmethod
     def __get_A(N, dx):
@@ -105,7 +109,7 @@ class generalized_fisher(ptype):
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-
+            n += 1
             if res < self.params.newton_tol:
                 break
 
@@ -117,10 +121,17 @@ class generalized_fisher(ptype):
             u.values -= spsolve(dg, g)
 
             # increase iteration count
-            n += 1
 
-        if n == self.params.newton_maxiter:
-            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+
+        if np.isnan(res) and self.params.stop_at_nan:
+            raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
+        elif np.isnan(res):
+            self.logger.warning('Newton got nan after %i iterations...' % n)
+
+	#print(n)
+        self.newton_itercount += n
+        #if n == self.params.newton_maxiter:
+        #    self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u
 

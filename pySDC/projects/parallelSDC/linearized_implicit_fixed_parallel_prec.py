@@ -28,5 +28,8 @@ class linearized_implicit_fixed_parallel_prec(linearized_implicit_fixed_parallel
         assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes + 1), \
             "ERROR: fixed_time_in_jacobian is too small or too large, got %s" % self.params.fixed_time_in_jacobian
 
+	#print(self.QI[1:, 1:])
         self.D, self.V = np.linalg.eig(self.QI[1:, 1:])
         self.Vi = np.linalg.inv(self.V)
+        
+

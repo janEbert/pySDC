@@ -51,3 +51,9 @@ class ptype(object):
         Abstract interface to RHS computation of the ODE
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
+
+    def apply_mass_matrix(self, u):
+        """
+        Abstract interface to apply mass matrix (only needed for FEM)
+        """
+        raise NotImplementedError('ERROR: if you want a mass matrix, implement apply_mass_matrix(u)')

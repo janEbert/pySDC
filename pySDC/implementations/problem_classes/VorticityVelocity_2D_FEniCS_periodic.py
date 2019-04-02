@@ -1,11 +1,12 @@
-from __future__ import division
+
+import logging
 
 import dolfin as df
 import numpy as np
-import logging
 
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 
 # noinspection PyUnusedLocal
@@ -19,14 +20,14 @@ class fenics_vortex_2d(ptype):
         K: stiffness matrix incl. diffusion coefficient (and correct sign)
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=rhs_fenics_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: FEniCS mesh data type (will be passed to parent class)
+            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)
         """
 
         # Sub domain for Periodic boundary condition
@@ -76,7 +77,7 @@ class fenics_vortex_2d(ptype):
         self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'],
                                   constrained_domain=PeriodicBoundary())
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().array()))
+        print('DoFs on this level:', len(tmp.vector().vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_vortex_2d, self).__init__(self.V, dtype_u, dtype_f, problem_params)

@@ -1,10 +1,9 @@
-from __future__ import division
 
 import numpy as np
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
-from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal
@@ -13,7 +12,7 @@ class outer_solar_system(ptype):
     Example implementing the outer solar system problem
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
@@ -49,7 +48,7 @@ class outer_solar_system(ptype):
         Returns:
             dtype_f: RHS
         """
-        me = acceleration(self.init, val=0.0)
+        me = self.dtype_f(self.init, val=0.0)
 
         # compute the acceleration due to gravitational forces
         # ... only with respect to the sun
@@ -84,7 +83,7 @@ class outer_solar_system(ptype):
             dtype_u: exact/initial position and velocity
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
-        me = particles(self.init)
+        me = self.dtype_u(self.init)
 
         me.pos.values[:, 0] = [0.0, 0.0, 0.0]
         me.pos.values[:, 1] = [-3.5025653, -3.8169847, -1.5507963]

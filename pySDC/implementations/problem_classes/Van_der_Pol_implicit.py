@@ -1,8 +1,8 @@
-from __future__ import division
 import numpy as np
 
+from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
@@ -11,7 +11,7 @@ class vanderpol(ptype):
     Example implementing the van der pol oscillator
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 
@@ -28,6 +28,10 @@ class vanderpol(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
         problem_params['nvars'] = 2
+
+        if 'stop_at_nan' not in problem_params:
+            problem_params['stop_at_nan'] = True
+
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super(vanderpol, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
@@ -88,6 +92,7 @@ class vanderpol(ptype):
 
         # start newton iteration
         n = 0
+        res = 99
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
@@ -95,7 +100,7 @@ class vanderpol(ptype):
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-            if res < self.params.newton_tol:
+            if res < self.params.newton_tol or np.isnan(res):
                 break
 
             # prefactor for dg/du
@@ -110,5 +115,13 @@ class vanderpol(ptype):
             x1 = u.values[0]
             x2 = u.values[1]
             n += 1
+
+        if np.isnan(res) and self.params.stop_at_nan:
+            raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
+        elif np.isnan(res):
+            self.logger.warning('Newton got nan after %i iterations...' % n)
+
+        if n == self.params.newton_maxiter:
+            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u

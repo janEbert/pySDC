@@ -1,10 +1,10 @@
-from __future__ import division
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
@@ -16,7 +16,7 @@ class testequation0d(ptype):
         A: digonal matrix containing the parameters
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

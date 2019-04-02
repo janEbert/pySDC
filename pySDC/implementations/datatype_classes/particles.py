@@ -1,6 +1,7 @@
 
-import numpy as np
 import copy as cp
+
+import numpy as np
 
 from pySDC.core.Errors import DataError
 
@@ -443,13 +444,35 @@ class acceleration(object):
             acceleration: sum of caller and other values (self+other)
         """
 
+        # cannot do type-checking here, because otherwise f-interpolation would not work
+        # (multiplication with a constant yields velocity, velocity + acceleration = booom!
+        # if isinstance(other, type(self)):
+        # always create new acceleration, since otherwise c = a + b changes a as well!
+        acc = acceleration(self.values.shape)
+        acc.values = self.values + other.values
+        return acc
+        # else:
+        #     raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+
+    def __sub__(self, other):
+        """
+        Overloading the subtraction operator for acceleration types
+
+        Args:
+            other (acceleration): acceleration object to be subtracted
+        Raises:
+            DataError: if other is not a acceleration object
+        Returns:
+            acceleration: subtraction of caller and other values (self+other)
+        """
+
         if isinstance(other, type(self)):
             # always create new acceleration, since otherwise c = a + b changes a as well!
             acc = acceleration(self.values.shape)
-            acc.values = self.values + other.values
+            acc.values = self.values - other.values
             return acc
         else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+            raise DataError("Type error: cannot subtract %s to %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
         """

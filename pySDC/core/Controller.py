@@ -1,17 +1,19 @@
+import logging
 import os
 import sys
-import logging
 
-from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, params):
         self.fine_comm = True
-        self.predict = True
+        self.mssdc_jac = True
+        self.predict_type = None
+        self.all_to_done = False
         self.logger_level = 20
         self.log_to_file = False
         self.dump_setup = True
@@ -192,7 +194,8 @@ class controller(object):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
+        #prit(res)
+        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
 
         return converged
 
