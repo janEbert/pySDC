@@ -2,7 +2,8 @@
 import pickle
 import numpy as np
 import subprocess
-
+import matplotlib.pyplot 
+import matplotlib.pyplot as plt
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -27,9 +28,11 @@ import matplotlib.pyplot as plt
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
 from pySDC.projects.parallelSDC.div_generic_implicit_MPI import div_generic_implicit_MPI
 from mpi4py import MPI
-
+import sys
 
 from pySDC.projects.parallelSDC.GS_2D_FD_implicit_Jac import GS_jac
+
+#from pyevtk import pointsToVTK
 
 def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=None, node_list=None):
 
@@ -46,14 +49,19 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 2
-    problem_params['nvars'] = [(2,32,32)] #, (128, 128)]
-    problem_params['eps'] = [0.04]
-    problem_params['newton_maxiter'] = 1# 50
+    problem_params['D0']=1e-4
+    problem_params['D1']=1e-5
+    problem_params['f']=0.0367
+    problem_params['k']=0.0649
+    
+
+    problem_params['nvars'] = [(2,32,32), (2,16,16)]
+
+    problem_params['newton_maxiter'] = 1 #50
     problem_params['newton_tol'] = 1E-11
     problem_params['lin_tol'] = 1E-12
     problem_params['lin_maxiter'] = 450 #0
-    problem_params['radius'] = 0.25
+
     problem_params['comm'] = node_comm #time_comm #MPI.COMM_WORLD #node_comm
 
     # This comes as read-in for the sweeper class
@@ -77,7 +85,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     description['sweeper_params'] = sweeper_params
     description['step_params'] = step_params
     description['space_transfer_class'] = mesh_to_mesh
-
+    #description['space_transfer_params['periodic'] = True
     #description['space_transfer_class'] = base_transfer_MPI #mesh_to_mesh
 
     #assert MPI.COMM_WORLD.Get_size() == sweeper_params['num_nodes']
@@ -85,7 +93,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.024 #01 #08 #0.01 #08 #04 #32
+    Tend = 1000 #01 #08 #0.01 #08 #04 #32
 
 
 
@@ -94,7 +102,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     for sweeper in sweeper_list:
         description['sweeper_class'] = sweeper
         error_reduction = []
-        for dt in [1e-3]:
+        for dt in [2]:
             print('Working with sweeper %s and dt = %s...' % (sweeper.__name__, dt))
 
             level_params['dt'] = dt
@@ -134,6 +142,8 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             uinit = P.u_exact(t0)
 
             
+
+            
             # call main function to get things done...
             MPI.COMM_WORLD.Barrier()            
             t1 = MPI.Wtime()
@@ -159,6 +169,14 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
 
 
 
+            #gridToVTK("./julia", uend.values[0,:,:] )
+            #gridToVTK("./rectilinear", x, y, z, cellData = {"pressure" : pressure}) 
+            #gridToVTK("./rectilinear", x, y, z, cellData = {"pressure" : uend.values[0,:,:]}) 
+            #matplotlib.pyplot.imshow(uend.values[0,:,:])
+            plt.imshow(uend.values[0,:,:], interpolation='bilinear')
+            plt.savefig('foo2.pdf')
+            #imageToVTK("./image", cellData = {"pressure" : uend.values[0,:,:]} )
+            
             # compute and print statistics
             filtered_stats = filter_stats(stats, type='niter')
             iter_counts = sort_stats(filtered_stats, sortby='time')
@@ -201,7 +219,7 @@ def main():
 
  
     #PFASST nur Zeit Parallel 
-    #run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
+    run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
     
     #neue Versionen ABER seriell in den Knoten
     #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
@@ -249,7 +267,7 @@ def main():
     #print(node_list)
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=comm)
 
-    run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
+    #run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
     #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
 

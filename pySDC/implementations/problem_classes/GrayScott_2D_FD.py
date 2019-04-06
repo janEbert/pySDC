@@ -43,7 +43,7 @@ class grayscott_fullyimplicit(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'eps', 'newton_maxiter', 'newton_tol', 'lin_tol', 'lin_maxiter', 'radius']
+        essential_keys = ['nvars', 'D0', 'D1','f','k', 'newton_maxiter', 'newton_tol', 'lin_tol', 'lin_maxiter']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -64,7 +64,8 @@ class grayscott_fullyimplicit(ptype):
         #self.nv = self.params.nvars[1]
         self.dx = 1.0 / self.params.nvars[1]
         self.A = self.__get_A(self.params.nvars, self.dx)
-        self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[1])])
+        self.xvalues = np.array([i * self.dx  for i in range(self.params.nvars[1])])
+        print("init ",self.xvalues)
 
         self.newton_itercount = 0
         self.lin_itercount = 0
@@ -123,8 +124,7 @@ class grayscott_fullyimplicit(ptype):
              
         z = self.dtype_u(self.init, val=0.0).values.flatten()
 
-        nu = self.params.nu
-        eps2 = self.params.eps ** 2
+
 
         Id = sp.eye(self.params.nvars[1]*self.params.nvars[2])
 
@@ -134,32 +134,35 @@ class grayscott_fullyimplicit(ptype):
         res = 99
         while n < self.params.newton_maxiter:
 
-            # form the function g with g(u) = 0
-            g0 = u0 - factor * (self.A.dot(u0) + 1.0 / eps2 * u0 * (1.0 - u0 ** nu)) - rhs.values[0,:,:].flatten()           
-            g1 = u1 - factor * (self.A.dot(u1) + 1.0 / eps2 * u1 * (1.0 - u1 ** nu)) - rhs.values[1,:,:].flatten()
-            # if g is close to 0, then we are done
+
+            g0 = u0 - factor * (self.params.D0*self.A.dot(u0) - u0 * u1** 2 + self.params.f*(1-u0)) - rhs.values[0,:,:].flatten()           
+            g1 = u1 - factor * (self.params.D1*self.A.dot(u1) + u0 * u1** 2 - (self.params.f+self.params.k)*u1) - rhs.values[1,:,:].flatten()
+
             
             g=np.zeros([2*self.params.nvars[1]*self.params.nvars[1]])
                 
             g[:self.params.nvars[1]*self.params.nvars[1]] += (g0)
             g[self.params.nvars[1]*self.params.nvars[1]:] += (g1)  
             
-            #print(g)
-            #sys.exit(0)
+
                         
             res = np.linalg.norm(g, np.inf)
 
             if res < self.params.newton_tol:
                 break
 
-            # assemble dg
+
             dg=np.zeros([2*self.params.nvars[1]*self.params.nvars[1], 2*self.params.nvars[1]*self.params.nvars[1]])
             
-            #print("s0", (Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u0 ** nu), offsets=0))).shape)
-            #print("s1", dg[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]].shape)
 
-            dg[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]] += (Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u0 ** nu), offsets=0)))
-            dg[self.params.nvars[1]*self.params.nvars[1]:, self.params.nvars[1]*self.params.nvars[1]:] += (Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u1 ** nu), offsets=0)))
+
+            dg[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]] += (Id - factor * (self.params.D0*self.A + sp.diags((-u1 ** 2 -self.params.f), offsets=0))) #00
+
+            dg[:self.params.nvars[1]*self.params.nvars[1], self.params.nvars[1]*self.params.nvars[1]:] += - factor * (sp.diags(( -2.0*u0*u1 ), offsets=0)) #01            
+            
+            dg[self.params.nvars[1]*self.params.nvars[1]:, self.params.nvars[1]*self.params.nvars[1]:] += (Id - factor * (self.params.D1*self.A + sp.diags((2.0*u0*u1-(self.params.f+self.params.k)), offsets=0))) #11
+            
+            dg[self.params.nvars[1]*self.params.nvars[1]:, :self.params.nvars[1]*self.params.nvars[1]] +=  - factor *  sp.diags(u1**2, offsets=0) #10           
 
 
         
@@ -202,8 +205,8 @@ class grayscott_fullyimplicit(ptype):
         v1 = u.values[1,:,:].flatten()        
         
         
-        f0 = self.A.dot(v0) + 1.0 / self.params.eps ** 2 * v0 * (1.0 - v0 ** self.params.nu)
-        f1 = self.A.dot(v1) + 1.0 / self.params.eps ** 2 * v1 * (1.0 - v1 ** self.params.nu)
+        f0 = self.params.D0*self.A.dot(v0) - v0 * v1** 2 + self.params.f*(1-v0)
+        f1 = self.params.D1*self.A.dot(v1) + v0 * v1** 2 - (self.params.f+self.params.k)*v1
         
         f.values[0,:,:] = f0.reshape([self.params.nvars[1], self.params.nvars[2]])
         f.values[1,:,:] = f1.reshape([self.params.nvars[1], self.params.nvars[2]])        
@@ -226,10 +229,14 @@ class grayscott_fullyimplicit(ptype):
         
         #print(self.params.nvars[1])
         for i in range(self.params.nvars[1]):
-            for j in range(self.params.nvars[1]):
-                r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                me.values[0,i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
-                me.values[1,i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+            for j in range(self.params.nvars[1]):            
+                if( (self.xvalues[i]-0.5)*(self.xvalues[i]-0.5) + (self.xvalues[j]-0.5)*(self.xvalues[j]-0.5) < 0.0025):
+                    print(0.5)
+                    me.values[0,i, j] = 0.5
+                    me.values[1,i, j] = 0.25
+                else:
+                    me.values[0,i, j] = 1.0
+                    me.values[1,i, j] = 0.0                    
 
 
         return me
