@@ -82,6 +82,8 @@ class allinclusive_multigrid_nonMPI(controller):
 
         # some initializations and reset of statistics
         uend = None
+        uend2= []
+        uend3= []
         num_procs = len(self.MS)
         self.hooks.reset_stats()
 
@@ -119,8 +121,14 @@ class allinclusive_multigrid_nonMPI(controller):
 
             # uend is uend of the last active step in the list
             uend = self.MS[active_slots[-1]].levels[0].uend
-
+            
+            
+            
             for p in active_slots:
+                #print("active slot ", p)
+                uend2.append(self.MS[active_slots[p]].levels[0].uend)
+                #uend3.append(self.MS[active_slots[p]].levels[0].uendruth)
+                uend3.append(self.MS[active_slots[p]].levels[0].u)
                 time[p] += num_procs * self.MS[p].dt
 
             # determine new set of active steps and compress slots accordingly
@@ -133,8 +141,9 @@ class allinclusive_multigrid_nonMPI(controller):
         # call post-run hook
         for S in self.MS:
             self.hooks.post_run(step=S, level_number=0)
-
-        return uend, self.hooks.return_stats()
+            
+        #return self.MS[0].levels[0].u, self.hooks.return_stats()
+        return uend3, self.hooks.return_stats()
 
     def restart_block(self, active_slots, time, u0):
         """
@@ -217,7 +226,7 @@ class allinclusive_multigrid_nonMPI(controller):
         Returns:
             all active steps
         """
-
+        #print("### im predict")
         # loop over all steps
         for S in MS:
 
@@ -280,12 +289,14 @@ class allinclusive_multigrid_nonMPI(controller):
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
+            #print("im spread")
             for S in MS:
 
                 # first stage: spread values
                 self.hooks.pre_step(step=S, level_number=0)
 
                 # call predictor from sweeper
+                #print("predict 1")
                 S.levels[0].sweep.predict()
 
                 # update stage
@@ -299,6 +310,7 @@ class allinclusive_multigrid_nonMPI(controller):
         elif stage == 'PREDICT':
             # call predictor (serial)
 
+            #print("predict 2")
             MS = self.predictor(MS)
 
             for S in MS:

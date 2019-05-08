@@ -10,7 +10,6 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
-# noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
@@ -18,6 +17,11 @@ class allencahn_fullyimplicit(ptype):
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
         dx: distance between two spatial nodes (same for both directions)
+        xvalues: array of grid values
+        newton_itercount (int): counts the number of Newton solves
+        lin_itercount = counts the number of inner linear solves
+        newton_ncalls = counts the number of Newton calls
+        lin_ncalls = counts the number of inner linear calls
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -84,7 +88,6 @@ class allencahn_fullyimplicit(ptype):
 
         return A
 
-    # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple Newton solver
@@ -125,10 +128,9 @@ class allencahn_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
             # increase iteration count
             n += 1
-            # print(n, res)
 
         # if n == self.params.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))

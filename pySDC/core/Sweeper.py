@@ -145,10 +145,8 @@ class sweeper(object):
         """
         Predictor to fill values at nodes before first sweep
 
-        Default prediction for the sweepers, only copies the values to all collocation nodes
-        and evaluates the RHS of the ODE there
         """
-
+        #print("sweeper predict")
         # get current level and problem description
         L = self.level
         P = L.prob
@@ -163,15 +161,24 @@ class sweeper(object):
                     L.u[m] = P.dtype_u(L.u[0])
                     L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
                 else:
-                    L.u[m] = P.dtype_u(init=P.init, val=0)
-                    L.f[m] = P.dtype_f(init=P.init, val=0)
+                    # Has u been filled?
+                    if L.u[m] is None:
+                        L.u[m] = P.dtype_u(init=P.init, val=0)
+                        L.f[m] = P.dtype_f(init=P.init, val=0)
+                    # If yes, has f been filled, too?
+                    elif L.f[m] is None:
+                        L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+                    # If yes, do not touch them
+                    else:
+                        pass
+        # If u0 has been passed, use it to fill the whole data structure
         else:
             if slot > 0:
-                first = (slot-1) * self.coll.num_nodes * P.init + (self.coll.num_nodes-1)*P.init
+                first = (slot - 1) * self.coll.num_nodes * P.init + (self.coll.num_nodes - 1) * P.init
                 last = first + P.init
                 L.u[0].values = u0[first:last].copy()
             for m in range(1, self.coll.num_nodes + 1):
-                first = slot * self.coll.num_nodes * P.init + (m-1)*P.init
+                first = slot * self.coll.num_nodes * P.init + (m - 1) * P.init
                 last = first + P.init
                 L.u[m] = P.dtype_u(init=P.init, val=0)
                 L.u[m].values = u0[first:last].copy()
@@ -179,6 +186,7 @@ class sweeper(object):
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True
+        #print("nach predict")
 
     def compute_residual(self):
         """
@@ -200,7 +208,7 @@ class sweeper(object):
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 res[m] += L.tau[m]
             # use abs function from data type here
             res_norm.append(abs(res[m]))

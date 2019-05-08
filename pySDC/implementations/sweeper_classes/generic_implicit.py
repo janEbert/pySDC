@@ -83,7 +83,7 @@ class generic_implicit(sweeper):
             # add initial value
             integral[m] += L.u[0]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
         # do the sweep
@@ -94,6 +94,7 @@ class generic_implicit(sweeper):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
+            print("level", m)
             L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
                                         L.time + L.dt * self.coll.nodes[m])
             # update function values
@@ -122,7 +123,17 @@ class generic_implicit(sweeper):
         if (self.coll.right_is_node and not self.params.do_coll_update):
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
+            #print("ausgabe")
+            for m in range(0, self.coll.num_nodes):
+                #print(L.u[m+1].values)
+                #L.uendruth.append(L.u[m+1].values)    
+                L.uendruth.extend(L.u[m+1].values)  
+            #print("ausgabeende")    
+            #print("vorher")
+            
+            #print("nachher")            
         else:
+            print("################################ hier sollte ich nicht sein! ##################################################")
             # start with u0 and add integral over the full interval (using coll.weights)
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):

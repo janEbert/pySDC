@@ -45,9 +45,13 @@ class generalized_fisher(ptype):
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
         self.A = self.__get_A(self.params.nvars, self.dx)
-        self.newton_counter = 0
+        self.newton_counter = 0        
         
-        print("im init")
+        self.inner_solve_counter = 0
+        
+        
+        
+
 
     @staticmethod
     def __get_A(N, dx):
@@ -63,7 +67,7 @@ class generalized_fisher(ptype):
         """
 
         stencil = [1, -2, 1]
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N + 2, N + 2), format='lil')
+        A = sp.diags(stencil, [-1, 0, 1], shape=(N , N ), format='lil')
         A *= 1.0 / (dx ** 2)
 
         return A
@@ -89,12 +93,12 @@ class generalized_fisher(ptype):
         lambda0 = self.params.lambda0
 
         # set up boundary values to embed inner points
-        lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - lambda0 ** 2)
-        ul = (1 + (2 ** (nu / 2.0) - 1) *
-              np.exp(-nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2.0 / nu)
-        ur = (1 + (2 ** (nu / 2.0) - 1) *
-              np.exp(-nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2.0 / nu)
+        #lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
+        #sig1 = lam1 - np.sqrt(lam1 ** 2 - lambda0 ** 2)
+        #ul = (1 + (2 ** (nu / 2.0) - 1) *
+        #      np.exp(-nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2.0 / nu)
+        #ur = (1 + (2 ** (nu / 2.0) - 1) *
+        #      np.exp(-nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2.0 / nu)
 
         # start newton iteration
         n = 0
@@ -102,19 +106,22 @@ class generalized_fisher(ptype):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            uext = np.concatenate(([ul], u.values, [ur]))
+            #uext = np.concatenate(([ul], u.values, [ur]))
             g = u.values - \
-                factor * (self.A.dot(uext)[1:-1] + lambda0 ** 2 * u.values * (1 - u.values ** nu)) - rhs.values
+                factor * (self.A.dot(u.values) + lambda0 ** 2 * u.values * (1 - u.values ** nu)) - rhs.values
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
+	    #print(res)
             if res < self.params.newton_tol:
                 break
 
-            # assemble dg
+
+	    #print(res)
+	    
             dg = sp.eye(self.params.nvars) - factor * \
-                (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
+                (self.A + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
 
             # newton update: u1 = u0 - g/dg
             u.values -= spsolve(dg, g)
@@ -124,7 +131,11 @@ class generalized_fisher(ptype):
 
         # if n == self.params.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
-        self.newton_counter += n
+        self.newton_counter += n        
+        #print(n," size ", len(u.values))
+        self.inner_solve_counter += n
+        
+        
         return u
 
     def eval_f(self, u, t):
@@ -139,17 +150,17 @@ class generalized_fisher(ptype):
             dtype_f: the RHS
         """
         # set up boundary values to embed inner points
-        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
-        ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
+        #sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        #ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
-        uext = np.concatenate(([ul], u.values, [ur]))
+        #uext = np.concatenate(([ul], u.values, [ur]))
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
+        f.values = self.A.dot(u.values) + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
         return f
 
     def u_exact(self, t):
@@ -165,10 +176,13 @@ class generalized_fisher(ptype):
 
         me = self.dtype_u(self.init)
         xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
-        print(xvalues)
+        #print(xvalues)
+        
+        
+        me.values = 1.*np.sin(xvalues)
 
-        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-                     np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+        #lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
+        #sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        #me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #             np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
         return me

@@ -31,7 +31,7 @@ class allencahn_fullyimplicit(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'eps', 'inner_maxiter', 'inner_tol', 'radius']
+        essential_keys = ['nvars', 'nu', 'eps', 'newton_maxiter', 'newton_tol', 'radius']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -46,14 +46,14 @@ class allencahn_fullyimplicit(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars
-        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
+        self.A = self.__get_A(self.params.nvars, self.dx)
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars)])
 
-        self.inner_solve_counter = 0
+        self.newton_itercount = 0
         self.newton_ncalls = 0
 
     @staticmethod
-    def __get_A(N, nu, dx):
+    def __get_A(N, dx):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -74,7 +74,7 @@ class allencahn_fullyimplicit(ptype):
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= nu / (dx ** 2)
+        A *= 1.0 / (dx ** 2)
 
         return A
 
@@ -96,7 +96,7 @@ class allencahn_fullyimplicit(ptype):
         me = self.dtype_u(self.init)
 
         me.values[:] = u0.values
-        nu = self.params.nu
+        nu = self.params.nuhile
         eps2 = self.params.eps ** 2
 
         Id = sp.eye(self.params.nvars)
@@ -104,7 +104,7 @@ class allencahn_fullyimplicit(ptype):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.inner_maxiter:
+        while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
             g = me.values - factor * (self.A.dot(me.values) + 1.0 / eps2 * me.values * (1.0 - me.values ** nu))\
@@ -113,7 +113,8 @@ class allencahn_fullyimplicit(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.inner_tol:
+
+            if res < self.params.newton_tol:
                 break
 
             # assemble dg
@@ -129,7 +130,8 @@ class allencahn_fullyimplicit(ptype):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
-        self.inner_solve_counter += n
+        #print(n)
+        self.newton_itercount += n
 
         return me
 
@@ -160,7 +162,6 @@ class allencahn_fullyimplicit(ptype):
             Jacobian matrix
         """
 
-        # noinspection PyTypeChecker
         dfdu = self.A + sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values ** self.params.nu),
                                  offsets=0)
         return dfdu
@@ -176,19 +177,9 @@ class allencahn_fullyimplicit(ptype):
             dtype_u: exact solution
         """
 
-        me = self.dtype_u(self.init)
-        xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
-
-        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        
-        me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-                     np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
-
-
-        #assert t == 0, 'ERROR: u_exact only valid for t=0'
-        #me = self.dtype_u(self.init, val=0.0)
-        #for i in range(self.params.nvars):
-            #me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
+        me = self.dtype_u(self.init, val=0.0)
+        for i in range(self.params.nvars):
+            me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
 
         return me

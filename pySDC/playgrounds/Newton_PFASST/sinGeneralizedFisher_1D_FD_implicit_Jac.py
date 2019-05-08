@@ -7,7 +7,7 @@ from scipy.sparse.linalg import spsolve
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
+from pySDC.implementations.problem_classes.sinGeneralizedFisher_1D_FD_implicit import generalized_fisher
 
 
 # noinspection PyUnusedLocal
@@ -28,7 +28,7 @@ class generalized_fisher_jac(generalized_fisher):
         super(generalized_fisher_jac, self).__init__(problem_params, dtype_u, dtype_f)
         
         self.Jf = None
-        self.Jfext = None
+        #self.Jfext = None
 
         self.inner_solve_counter = 0
     
@@ -75,15 +75,15 @@ class generalized_fisher_jac(generalized_fisher):
         # set up boundary values to embed inner points
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
-        ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
-        uext = np.concatenate(([ul], u.values, [ur]))
+        #uext = np.concatenate(([ul], u.values, [ur]))
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
+        f.values = self.A.dot(u.values) + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
         return f
         
 
@@ -102,16 +102,16 @@ class generalized_fisher_jac(generalized_fisher):
         """
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
-        ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        #ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #      np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
 
-        uext = np.concatenate(([ul], u.values, [ur]))
+        #uext = np.concatenate(([ul], u.values, [ur]))
 
         f = self.dtype_f(self.init)
-        f.values = self.Jfext.dot(uext)[1:-1] 
+        f.values = self.Jf.dot(u.values) 
         return f
 
         #f = self.dtype_f(self.init)
@@ -135,21 +135,21 @@ class generalized_fisher_jac(generalized_fisher):
         """
         #lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         #sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        ul = 0 #(1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #ul = 0 #(1 + (2 ** (self.params.nu / 2.0) - 1) *
               #np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
-        ur = 1 #(1 + (2 ** (self.params.nu / 2.0) - 1) *
+        #ur = 1 #(1 + (2 ** (self.params.nu / 2.0) - 1) *
               #np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
 
-        uext = np.concatenate(([ul], u.values, [ur]))
+        #uext = np.concatenate(([ul], u.values, [ur]))
 	
-        Jext = sp.diags(self.params.lambda0 ** 2 - self.params.lambda0 ** 2 *(self.params.nu + 1) * uext ** self.params.nu, offsets=0)	
+        #Jext = sp.diags(self.params.lambda0 ** 2 - self.params.lambda0 ** 2 *(self.params.nu + 1) * uext ** self.params.nu, offsets=0)	
 
-	self.Jfext = self.A + Jext
+	#self.Jfext = self.A + Jext
 
         J = sp.diags(self.params.lambda0 ** 2 - self.params.lambda0 ** 2 *(self.params.nu + 1) * u.values ** self.params.nu, offsets=0)
 
-        self.Jf = self.A[1:-1, 1:-1] + J
+        self.Jf = self.A + J
         
 
         
