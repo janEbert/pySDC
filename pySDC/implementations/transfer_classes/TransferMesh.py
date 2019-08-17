@@ -29,7 +29,7 @@ class mesh_to_mesh(space_transfer):
             coarse_prob: coarse problem
             params: parameters for the transfer operators
         """
-
+        self.j=0
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
 
@@ -49,10 +49,24 @@ class mesh_to_mesh(space_transfer):
                 raise TransferError('nvars parameter of coarse problem needs to be an int')
         else:
             raise TransferError("unknow type of nvars for transfer, got %s" % self.fine_prob.params.nvars)
+        
+ 
+        if type(self.fine_prob.params.nvars) is int:
+                fi= self.fine_prob.params.nvars
+                co= self.coarse_prob.params.nvars         
+ 
+        else:
+                fi= self.fine_prob.params.nvars[1]
+                co= self.coarse_prob.params.nvars[1]                          
+
+        #print(fi, co)
+        #exit()
+
 
         # we have a 1d problem
-        if type(self.fine_prob.params.nvars) is int:
+        if True: #type(self.fine_prob.params.nvars) is int:
 
+            
             # if number of variables is the same on both levels, Rspace and Pspace are identity
             if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
                 self.Rspace = sp.eye(self.coarse_prob.params.nvars)
@@ -61,12 +75,12 @@ class mesh_to_mesh(space_transfer):
             else:
 
                 if not self.params.periodic:
-                    fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+                    fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(fi)])
                     coarse_grid = np.array(
-                        [(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+                        [(i + 1) * self.coarse_prob.dx for i in range(co)])
                 else:
-                    fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
-                    coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+                    fine_grid = np.array([i * self.fine_prob.dx for i in range(fi)])
+                    coarse_grid = np.array([i * self.coarse_prob.dx for i in range(co)])
 
                 self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                          periodic=self.params.periodic,
@@ -86,6 +100,12 @@ class mesh_to_mesh(space_transfer):
                         th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
                                                    periodic=self.params.periodic,
                                                    equidist_nested=self.params.equidist_nested).T
+            
+            if type(self.fine_prob.params.nvars) is not int:                                                   
+                self.Rspace = sp.kron(sp.diags([[1, 1]], [0]),self.Rspace, format='csc' )   
+                self.Pspace = sp.kron(sp.diags([[1, 1]], [0]),self.Pspace, format='csc' )   
+                #print("transfer", self.Rspace)         
+            #exit()                        
 
         # we have an n-d problem
         else:
@@ -145,11 +165,20 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
+        #print("restriction", F.values)
         if isinstance(F, mesh):
             F.values = F.values.flatten()
+            #print(F.values.shape)
+            #print(self.Rspace.shape)            
             G = F.apply_mat(self.Rspace)
             G.values = G.values.reshape(self.coarse_prob.params.nvars)
             F.values = F.values.reshape(self.fine_prob.params.nvars)
+            
+            #print("restriction",self.j , G.values) 
+            self.j = self.j+1
+            #if self.j >4:   
+            #    exit()            
+            
         elif isinstance(F, rhs_imex_mesh):
             F.impl.values = F.impl.values.flatten()
             F.expl.values = F.expl.values.flatten()
@@ -168,6 +197,7 @@ class mesh_to_mesh(space_transfer):
             F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
+
         return G
 
     def prolong(self, G):

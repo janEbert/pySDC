@@ -87,6 +87,7 @@ class controller_nonMPI(controller):
             stats object containing statistics for each step, each level and each iteration
         """
 
+
         # some initializations and reset of statistics
         uend = None
         num_procs = len(self.MS)
@@ -110,9 +111,11 @@ class controller_nonMPI(controller):
         # initialize block of steps with u0
         self.restart_block(active_slots, time, u0)
 
+        
         # call pre-run hook
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
+
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -121,14 +124,23 @@ class controller_nonMPI(controller):
             for p in active_slots:
                 MS_active.append(self.MS[p])
 
+  
+            
             while not all([MS_active[p].status.done for p in range(len(MS_active))]):
                 MS_active = self.pfasst(MS_active)
+
+
                 
             for p in range(len(MS_active)):
                 self.MS[active_slots[p]] = MS_active[p]
 
+
+
             # uend is uend of the last active step in the list
             uend = self.MS[active_slots[-1]].levels[0].uend
+
+
+
 
             for p in active_slots:
                 time[p] += num_procs * self.MS[p].dt

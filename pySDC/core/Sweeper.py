@@ -231,6 +231,8 @@ class sweeper(object):
         # get current level and problem description
         L = self.level
         P = L.prob
+        
+        #print("prdict u0", L.u[0].values)
 
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
@@ -276,7 +278,6 @@ class sweeper(object):
 
         # find maximal residual over the nodes
         L.status.residual = max(res_norm)
-
         # indicate that the residual has seen the new values
         L.status.updated = False
 

@@ -45,7 +45,7 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         Returns:
             None
         """
-
+        print("in update node")
         # get current level and problem description
         L = self.level
         P = L.prob

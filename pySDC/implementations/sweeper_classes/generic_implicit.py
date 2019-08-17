@@ -27,6 +27,7 @@ class generic_implicit(sweeper):
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
         self.newton_itercount = 0
 
+
     def integrate(self):
         """
         Integrates the right-hand side
@@ -79,18 +80,29 @@ class generic_implicit(sweeper):
             for j in range(1, M + 1):
                 integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
 
+
+
             # add initial value
             integral[m] += L.u[0]
             # add tau if associated
             if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
+
+
+
+
         # do the sweep
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
+            
+
+            
             for j in range(1, m + 1):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
+
+
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
@@ -129,5 +141,7 @@ class generic_implicit(sweeper):
             # add up tau correction of the full interval (last entry)
             if L.tau[-1] is not None:
                 L.uend += L.tau[-1]
+
+
 
         return None

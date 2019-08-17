@@ -154,7 +154,7 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
         #for m in range(M):  # hell yeah, this is parallel!!
         L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
 
-
+        print("self.rank", self.rank)
 
         # indicate presence of new values at this level
         L.status.updated = True

@@ -44,7 +44,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(256,256), (128, 128)]
+    problem_params['nvars'] = [(256,256), (128, 128)] #[256 , 128] #[(256,256), (128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 1# 50
     problem_params['newton_tol'] = 1E-11
@@ -110,7 +110,8 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                 #controller = controller_MPI(controller_params=controller_params, description=description, comm=controller_comm)                  
                 #else: 
                 #    serial==False
-                if (sweeper.__name__=='linearized_implicit_fixed_parallel_prec_MPI'or sweeper.__name__=="linearized_implicit_fixed_parallel_MPI"):
+                print("in here")
+                if (sweeper.__name__=='linearized_implicit_fixed_parallel_prec_MPI'or sweeper.__name__=="linearized_implicit_fixed_parallel_MPI"): 
                     description['base_transfer_class'] = base_transfer_MPI
                     controller = controller_MPI(controller_params=controller_params, description=description, comm=controller_comm)
                 else:
@@ -130,7 +131,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             # get initial values on finest level
             uinit = P.u_exact(t0)
 
-            
+            print("starte")
             # call main function to get things done...
             MPI.COMM_WORLD.Barrier()            
             t1 = MPI.Wtime()
@@ -138,56 +139,12 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             t2 = MPI.Wtime()          
             time =t2-t1   
             print( "My elapsed time is ", time)
-            maxtime=time            
-            maxtime = np.zeros(1, dtype='float64')
-            local_time = np.max(time).astype('float64')
-            MPI.COMM_WORLD.Allreduce(local_time,maxtime, op=MPI.MAX)           
-            print( "Elapsed max time is ", maxtime[0])
 
-
-            if(True): #control the solution    
-                fname = 'ref_24.npz'
-                loaded = np.load(fname)
-                uref = loaded['uend']
-                print("Fehler ", np.linalg.norm(uref-uend.values, np.inf))
-                print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values-uend.values, np.inf))
-
-
-
-
-
-            # compute and print statistics
-            filtered_stats = filter_stats(stats, type='niter')
-            iter_counts = sort_stats(filtered_stats, sortby='time')
-            niters = np.array([item[1] for item in iter_counts])
-            print("Iterationen SDC ", niters)
-            print("Newton Iterationen ", P.newton_itercount)
-
-            maxcount = np.zeros(1, dtype='float64')
-            local_count = np.max(P.newton_itercount).astype('float64')
-            MPI.COMM_WORLD.Allreduce(local_count,maxcount, op=MPI.MAX)
-            print("maxiter ", maxcount[0])
-
-
- 
-            if(serial==False):
-
-                for pp in controller.MS:
-                    print("Newton Iter ", pp.levels[0].prob.newton_itercount)
-                    print("lineare Iter ", pp.levels[0].prob.linear_count)
-                    print("warning ", pp.levels[0].prob.warning_count)    
-                    print("time for linear solve ", pp.levels[0].prob.time_for_solve)
-            else:
-
-                print("Newton Iter ", controller.S.levels[0].prob.newton_itercount)
-                print("lineare Iter ", controller.S.levels[0].prob.linear_count)
-                print("warning ", controller.S.levels[0].prob.warning_count)    
-                print("time for linear solve ", controller.S.levels[0].prob.time_for_solve)
-                
             
 
-            MPI.COMM_WORLD.Barrier()     
-            print("------------------------------------------------------------------------------------------------------------------------------------------")       
+            #MPI.COMM_WORLD.Barrier()     
+            print("------------------------------------------------------------------------------------------------------------------------------------------")  
+            #exit()     
 
 def main():
     """
@@ -249,10 +206,13 @@ def main():
     run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
     #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
-
-
+    print("fertig klm")
+    #exit()
 if __name__ == "__main__":
     main()
+    #exit()
+    print("in if")
+print("ganz am ende")
 
 
 
