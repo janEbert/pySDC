@@ -1,4 +1,4 @@
-﻿from mpi4py import MPI
+from mpi4py import MPI
 
 from pySDC.core.Sweeper import sweeper
 
@@ -29,10 +29,6 @@ class generic_implicit_MPI(sweeper):
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
 
         self.rank = self.params.comm.Get_rank()
-        
-
-        #print("generic")
-        #print(self.rank)
 
     def integrate(self):
         """
@@ -149,7 +145,6 @@ class generic_implicit_MPI(sweeper):
         # find maximal residual over the nodes
         L.status.residual = self.params.comm.allreduce(res_norm, op=MPI.MAX)
 
-        #print("residuum", L.status.residual)
         # indicate that the residual has seen the new values
         L.status.updated = False
 
@@ -170,16 +165,13 @@ class generic_implicit_MPI(sweeper):
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
 
-        #print("im predict ", self.params.comm.Get_size())
-
-        if self.params.spread:
+        if self.params.initial_guess == 'spread':
             L.u[self.rank + 1] = P.dtype_u(L.u[0])
             L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
         else:
-            L.u[self.rank + 1] = P.dtype_u(init=P.init, val=0)
-            L.f[self.rank + 1] = P.dtype_f(init=P.init, val=0)
+            L.u[self.rank + 1] = P.dtype_u(init=P.init, val=0.0)
+            L.f[self.rank + 1] = P.dtype_f(init=P.init, val=0.0)
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True
-        #print("end predict")

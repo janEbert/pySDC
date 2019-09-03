@@ -15,7 +15,7 @@ class mesh(object):
         values (np.ndarray): contains the ndarray of the values
     """
 
-    def __init__(self, init=None, val=None):
+    def __init__(self, init=None, val=0.0):
         """
         Initialization routine
 
@@ -27,13 +27,12 @@ class mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another mesh, do a deepcopy (init by copy)
+        # if init is another mesh, do a copy (init by copy)
         if isinstance(init, mesh):
-            self.values = cp.deepcopy(init.values)
+            self.values = init.values.copy()
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         elif isinstance(init, tuple) or isinstance(init, int):
-            self.values = np.empty(init, dtype=np.float64)
-            self.values[:] = val
+            self.values = np.full(init, fill_value=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -52,7 +51,7 @@ class mesh(object):
 
         if isinstance(other, mesh):
             # always create new mesh, since otherwise c = a + b changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values + other.values
             return me
         else:
@@ -72,7 +71,7 @@ class mesh(object):
 
         if isinstance(other, mesh):
             # always create new mesh, since otherwise c = a - b changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values - other.values
             return me
         else:
@@ -92,7 +91,7 @@ class mesh(object):
 
         if isinstance(other, float) or isinstance(other, complex):
             # always create new mesh, since otherwise c = f*a changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values * other
             return me
         else:
@@ -129,22 +128,6 @@ class mesh(object):
 
         return me
 
-    def send(self, dest=None, tag=None, comm=None):
-        """
-        Routine for sending data forward in time (blocking)
-
-        Args:
-            dest (int): target rank
-            tag (int): communication tag
-            comm: communicator
-
-        Returns:
-            None
-        """
-
-        comm.send(self.values, dest=dest, tag=tag)
-        return None
-
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
@@ -157,9 +140,9 @@ class mesh(object):
         Returns:
             request handle
         """
-        return comm.isend(self.values, dest=dest, tag=tag)
+        return comm.Issend(self.values[:], dest=dest, tag=tag)
 
-    def recv(self, source=None, tag=None, comm=None):
+    def irecv(self, source=None, tag=None, comm=None):
         """
         Routine for receiving in time
 
@@ -171,8 +154,7 @@ class mesh(object):
         Returns:
             None
         """
-        self.values = comm.recv(source=source, tag=tag)
-        return None
+        return comm.Irecv(self.values[:], source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
         """
@@ -211,7 +193,7 @@ class rhs_imex_mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
+        # if init is another rhs_imex_mesh, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.impl = mesh(init.impl)
             self.expl = mesh(init.expl)
@@ -237,7 +219,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, rhs_imex_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = self.impl.values - other.impl.values
             me.expl.values = self.expl.values - other.expl.values
             return me
@@ -258,7 +240,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, rhs_imex_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = self.impl.values + other.impl.values
             me.expl.values = self.expl.values + other.expl.values
             return me
@@ -279,7 +261,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, float):
             # always create new rhs_imex_mesh
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = other * self.impl.values
             me.expl.values = other * self.expl.values
             return me
@@ -329,7 +311,7 @@ class rhs_comp2_mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
+        # if init is another rhs_imex_mesh, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.comp1 = mesh(init.comp1)
             self.comp2 = mesh(init.comp2)
@@ -355,7 +337,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, rhs_comp2_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = self.comp1.values - other.comp1.values
             me.comp2.values = self.comp2.values - other.comp2.values
             return me
@@ -376,7 +358,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, rhs_comp2_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = self.comp1.values + other.comp1.values
             me.comp2.values = self.comp2.values + other.comp2.values
             return me
@@ -397,7 +379,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, float):
             # always create new rhs_imex_mesh
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = other * self.comp1.values
             me.comp2.values = other * self.comp2.values
             return me

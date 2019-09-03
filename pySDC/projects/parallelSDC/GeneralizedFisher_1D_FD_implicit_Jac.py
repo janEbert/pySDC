@@ -41,5 +41,4 @@ class generalized_fisher_jac(generalized_fisher):
 
         me = self.dtype_u(self.init)
         me.values = spsolve(sp.eye(self.params.nvars) - factor * dfdu, rhs.values)
-        self.newton_itercount += 1
         return me

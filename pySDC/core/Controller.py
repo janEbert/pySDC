@@ -10,7 +10,6 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, params):
-        self.fine_comm = True
         self.mssdc_jac = True
         self.predict_type = None
         self.all_to_done = False
@@ -18,6 +17,7 @@ class _Pars(FrozenClass):
         self.log_to_file = False
         self.dump_setup = True
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
+        self.use_iteration_estimator = False
 
         for k, v in params.items():
             setattr(self, k, v)
@@ -38,20 +38,19 @@ class controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
 
+        # check if we have a hook on this list. if not, use default class.
+        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
+        self.__hooks = controller_params['hook_class']()
+
+        self.hooks.pre_setup(step=None, level_number=None)
+
         self.params = _Pars(controller_params)
 
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger = logging.getLogger('controller')
 
-        # if self.params.dump_setup and self.params.logger_level > 20:
-        #     self.logger.warning('Will not dump setup, logging level is too high, need at most 20')
-
-        # check if we have a hook on this list. if not, use default class.
-        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
-
-        self.__hooks = controller_params['hook_class']()
-
-        pass
+        if self.params.use_iteration_estimator and self.params.all_to_done:
+            self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
 
     @staticmethod
     def __setup_custom_logger(level=None, log_to_file=None, fname=None):
@@ -194,8 +193,9 @@ class controller(object):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        #prit(res)
         converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
+        if converged is None:
+            converged = False
 
         return converged
 

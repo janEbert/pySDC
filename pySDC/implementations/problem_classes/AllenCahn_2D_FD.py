@@ -1,25 +1,14 @@
-from mpi4py import MPI
+
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
-from scipy.sparse.linalg import spsolve
-from scipy.sparse.linalg import gmres
-import scipy.sparse.linalg as spla
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
 
-class gmres_counter(object):
-    def __init__(self, disp=False):
-        self._disp = disp
-        self.niter = 0
-    def __call__(self, rk=None):
-        self.niter += 1
-        if self._disp:
-            print('iter %3i\trk = %s' % (self.niter, str(rk)))
 
-
+# http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
 # noinspection PyUnusedLocal
@@ -69,9 +58,6 @@ class allencahn_fullyimplicit(ptype):
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
-        self.warning_count = 0
-        self.linear_count = 0
-        self.time_for_solve = 0
 
     @staticmethod
     def __get_A(N, dx):
@@ -116,13 +102,11 @@ class allencahn_fullyimplicit(ptype):
 
         u = self.dtype_u(u0).values.flatten()
         z = self.dtype_u(self.init, val=0.0).values.flatten()
-        #z = self.dtype_u(u0).values.flatten()        
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
-        counter = gmres_counter()
         # start newton iteration
         n = 0
         res = 99
@@ -133,37 +117,16 @@ class allencahn_fullyimplicit(ptype):
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-	    #print(res)
+
             if res < self.params.newton_tol:
                 break
-
 
             # assemble dg
             dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
 
-
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            t1 = MPI.Wtime()  
-            
-            #M2 = spla.spilu(dg)
-            #M_x = lambda x: M2.solve(x)
-            #M = spla.LinearOperator((len(g),len(g)), M_x)
-            #x = spla.gmres(dg,b,M=M)
-            ###u -=   gmres(dg, g, x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, M=M, callback=counter)[0]                       
-            u -= gmres(dg, g, x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)[0]
-            #u -= spsolve(dg, g)
-            ###u -=   gmres(dg, g, x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)[0]            
-            #new = spsolve(mat, rhs.flatten())
-            t2 = MPI.Wtime()             
-            #print( "solve system ")
-            #print(counter.niter)            
-            #print( t2 - t1 );  
-            self.newton_itercount += 1
-            self.linear_count += counter.niter
-            self.time_for_solve += t2-t1 
-            if counter.niter== self.params.lin_maxiter:
-                self.warning_count += 1          
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -171,14 +134,12 @@ class allencahn_fullyimplicit(ptype):
         # if n == self.params.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
-
-        
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
-	#print(n)
+
         self.newton_ncalls += 1
-        #self.newton_itercount += n
-        #print(me.values)
+        self.newton_itercount += n
+
         return me
 
     def eval_f(self, u, t):

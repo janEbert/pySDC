@@ -505,7 +505,6 @@ class allencahn_periodic_fullyimplicit(ptype):
             self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
-        #print(n)
         self.newton_itercount += n
 
         me = self.dtype_u(self.init)

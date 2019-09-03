@@ -32,29 +32,29 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-04
+    level_params['restol'] = 1E-08
+    level_params['dt'] = 1E-03
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [3]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(256,256)] # [(128, 128)]
+    problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
-    problem_params['newton_maxiter'] = 1000
-    problem_params['newton_tol'] = 1E-13
-    problem_params['lin_tol'] = 1E-14
-    problem_params['lin_maxiter'] = 1000
+    problem_params['newton_maxiter'] = 100
+    problem_params['newton_tol'] = 1E-09
+    problem_params['lin_tol'] = 1E-10
+    problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
     # initialize step parameters
@@ -132,7 +132,7 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.024 #32
+    Tend = 0.032
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -144,37 +144,34 @@ def run_SDC_variant(variant=None, inexact=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    fname = 'ref_24.npz'
-    np.savez_compressed(file=fname, uend=uend.values)
-    
     # filter statistics by variant (number of iterations)
-    #filtered_stats = filter_stats(stats, type='niter')
+    filtered_stats = filter_stats(stats, type='niter')
 
     # convert filtered statistics to list of iterations count, sorted by process
-    #iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = sort_stats(filtered_stats, sortby='time')
 
     # compute and print statistics
-    #niters = np.array([item[1] for item in iter_counts])
-    #out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    #print(out)
-    #out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-    #print(out)
-    #out = '   Position of max/min number of iterations: %2i -- %2i' % \
-    #      (int(np.argmax(niters)), int(np.argmin(niters)))
-    #print(out)
-    #out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-    #print(out)
+    niters = np.array([item[1] for item in iter_counts])
+    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    print(out)
+    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    print(out)
+    out = '   Position of max/min number of iterations: %2i -- %2i' % \
+          (int(np.argmax(niters)), int(np.argmin(niters)))
+    print(out)
+    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    print(out)
 
-    #print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
-    #print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
-    #                                                           P.lin_itercount / max(P.lin_ncalls, 1)))
+    print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+    print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
+                                                               P.lin_itercount / max(P.lin_ncalls, 1)))
 
-    #timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-    #print('Time to solution: %6.4f sec.' % timing[0][1])
-    #print()
+    print('Time to solution: %6.4f sec.' % timing[0][1])
+    print()
 
-    #return stats
+    return stats
 
 
 def show_results(fname, cwd=''):
@@ -313,20 +310,20 @@ def main(cwd=''):
 
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['fully-implicit']: #'multi-implicit', 'semi-implicit', , 'semi-implicit_v2', 'multi-implicit_v2']:
+    for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-        #results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
-    #fname = 'data/results_SDC_variants_AllenCahn_1E-03'
-    #file = open(cwd + fname + '.pkl', 'wb')
-    #dill.dump(results, file)
-    #file.close()
-    #assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
+    fname = 'data/results_SDC_variants_AllenCahn_1E-03'
+    file = open(cwd + fname + '.pkl', 'wb')
+    dill.dump(results, file)
+    file.close()
+    assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
-    #show_results(fname, cwd=cwd)
+    show_results(fname, cwd=cwd)
 
 
 if __name__ == "__main__":

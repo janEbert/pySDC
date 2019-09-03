@@ -17,7 +17,7 @@ class _Pars(FrozenClass):
     def __init__(self, pars):
 
         self.do_coll_update = False
-        self.spread = True
+        self.initial_guess = 'spread'
 
         for k, v in pars.items():
             if k is not 'collocation_class':
@@ -237,13 +237,15 @@ class sweeper(object):
 
         for m in range(1, self.coll.num_nodes + 1):
             # copy u[0] to all collocation nodes, evaluate RHS
-            if self.params.spread:
+            if self.params.initial_guess == 'spread':
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
             # start with zero everywhere
+            elif self.params.initial_guess == 'zero':
+                L.u[m] = P.dtype_u(init=P.init, val=0.0)
+                L.f[m] = P.dtype_f(init=P.init, val=0.0)
             else:
-                L.u[m] = P.dtype_u(init=P.init, val=0)
-                L.f[m] = P.dtype_f(init=P.init, val=0)
+                raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
@@ -275,7 +277,17 @@ class sweeper(object):
             res_norm.append(abs(res[m]))
 
         # find maximal residual over the nodes
-        L.status.residual = max(res_norm)
+        if L.params.residual_type == 'full_abs':
+            L.status.residual = max(res_norm)
+        elif L.params.residual_type == 'last_abs':
+            L.status.residual = res_norm[-1]
+        elif L.params.residual_type == 'full_rel':
+            L.status.residual = max(res_norm) / abs(L.u[0])
+        elif L.params.residual_type == 'last_rel':
+            L.status.residual = res_norm[-1] / abs(L.u[0])
+        else:
+            raise ParameterError(f'residual_type = {L.params.residual_type} not implemented, choose '
+                                 f'full_abs, last_abs, full_rel or last_rel instead')
 
         # indicate that the residual has seen the new values
         L.status.updated = False

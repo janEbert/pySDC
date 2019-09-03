@@ -25,7 +25,6 @@ class generic_implicit(sweeper):
 
         # get QI matrix
         self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
-        self.newton_itercount = 0
 
     def integrate(self):
         """
@@ -44,7 +43,7 @@ class generic_implicit(sweeper):
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init, val=0))
+            me.append(P.dtype_u(P.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
                 me[-1] += L.dt * self.coll.Qmat[m, j] * L.f[j]
 
