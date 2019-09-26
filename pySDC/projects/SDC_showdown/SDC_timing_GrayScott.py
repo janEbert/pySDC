@@ -53,6 +53,7 @@ def setup_parameters():
     problem_params['lsol_tol'] = 1E-10
     problem_params['lsol_maxiter'] = 100
 
+
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50

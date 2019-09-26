@@ -212,8 +212,8 @@ class controller_MPI(controller):
         if request is not None and self.req_ibcast is not None:
             while not request.Test():
                 if self.req_ibcast.Test():
-                    self.logger.debug(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
-                    self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
+                    #self.logger.debug(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
+                    #self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
                     self.S.status.force_done = True
                     return None
         if request is not None:
@@ -271,18 +271,18 @@ class controller_MPI(controller):
             self.S.status.diff_old_loc = diff_new
             alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
             Kest_loc = np.log(self.S.params.errtol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-            self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                              f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
-                              f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+            #self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+            #                  f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+            #                  f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
             Kest_glob = Kest_loc
             # If condition is met, send interrupt
             if np.ceil(Kest_glob) <= self.S.status.iter:
                 if self.S.status.last:
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting..')
+                    #self.logger.debug(f'{self.S.status.slot} is done, broadcasting..')
                     self.hooks.pre_comm(step=self.S, level_number=0)
                     comm.Ibcast((np.array([1]), MPI.INT), root=self.S.status.slot).Wait()
                     self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
-                    self.logger.debug(f'{self.S.status.slot} is done, broadcasting done')
+                    #self.logger.debug(f'{self.S.status.slot} is done, broadcasting done')
                     self.S.status.done = True
                 else:
                     self.hooks.pre_comm(step=self.S, level_number=0)
@@ -773,11 +773,11 @@ class controller_MPI(controller):
 
         # If interrupt is there, cleanup and finish
         if self.params.use_iteration_estimator and not self.S.status.last and self.req_ibcast.Test():
-            self.logger.debug(f'{self.S.status.slot} is done..')
+            #self.logger.debug(f'{self.S.status.slot} is done..')
             self.S.status.done = True
 
             if not stage == 'IT_CHECK':
-                self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
+                #self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
                 self.S.levels[0].u[1:] = self.S.levels[0].uold[1:]
 
             self.hooks.post_iteration(step=self.S, level_number=0)

@@ -13,7 +13,6 @@ from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
 
 from pySDC.projects.parallelPFASST.AC_2D_FD_implicit_Jac import AC_jac
 
-
 from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
 #from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
 

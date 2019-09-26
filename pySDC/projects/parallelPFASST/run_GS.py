@@ -11,10 +11,14 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
 
-from pySDC.projects.parallelPFASST.AC_2D_FD_implicit_Jac import AC_jac
+#from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott_fullyimplicit #GS_jac
+#from pySDC.implementations.problem_classes.GrayScott_2D_FD import grayscott_fullyimplicit
 
+from pySDC.projects.parallelPFASST.GS_2D_FD_implicit_Jac import GS_jac
 
 from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
+
+#from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
 #from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
 
 #from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
@@ -35,46 +39,60 @@ from mpi4py import MPI
 
 def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=None, node_list=None):
 
+
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-08
+    level_params['dt'] = 0.5
+    level_params['nsweeps'] = [1]
+    
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['num_nodes'] = [4]
+    sweeper_params['QI'] = ['LU']
+    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['fixed_time_in_jacobian'] = 0
+    sweeper_params['comm'] = node_comm
+    sweeper_params['node_list'] = node_list
+
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
     step_params['maxiter'] = 50
 
-    # This comes as read-in for the problem class
+
+    # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 2
-    problem_params['nvars'] = [(256,256), (128, 128)]
-    problem_params['eps'] = [0.04]
-    problem_params['newton_maxiter'] = 1 #50
+    problem_params['D0'] = 1.0
+    problem_params['D1'] = 0.01
+    problem_params['f'] = 0.09
+    problem_params['k'] = 0.086
+    problem_params['nvars'] = [(2,32,32),(2,16,16)] # [(128, 128),(64,64)]
+    problem_params['nlsol_tol'] = 1E-10
+    problem_params['nlsol_maxiter'] = 100
+    problem_params['lsol_tol'] = 1E-10
+    problem_params['lsol_maxiter'] = 100
+    problem_params['newton_maxiter'] = 1 
     problem_params['newton_tol'] = 1E-11
     problem_params['lin_tol'] = 1E-12
-    problem_params['lin_maxiter'] = 450 #0
-    problem_params['radius'] = 0.25
-    problem_params['comm'] = node_comm #time_comm #MPI.COMM_WORLD #node_comm
+    problem_params['lin_maxiter'] = 450 
+    problem_params['comm'] = MPI.COMM_SELF   #node_comm 
 
-    # This comes as read-in for the sweeper class
-    sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = 4
-    sweeper_params['QI'] = 'LU'
-    sweeper_params['fixed_time_in_jacobian'] = 0
-    sweeper_params['comm'] = node_comm
-    sweeper_params['node_list'] = node_list
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = err_reduction_hook
-
-    # Fill description dictionary for easy hierarchy creation
+    
+    # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = AC_jac 
-    description['problem_params'] = problem_params
-    description['sweeper_params'] = sweeper_params
-    description['step_params'] = step_params
+    description['problem_class'] = GS_jac #grayscott_fullyimplicit   # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = None  # pass sweeper (see part B)
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh
 
     #description['space_transfer_class'] = base_transfer_MPI #mesh_to_mesh
@@ -84,7 +102,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.024 
+    Tend = 2
 
 
 
@@ -93,7 +111,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     for sweeper in sweeper_list:
         description['sweeper_class'] = sweeper
         error_reduction = []
-        for dt in [1e-3]:
+        for dt in [0.5]: #1e-3]:
             print('Working with sweeper %s and dt = %s...' % (sweeper.__name__, dt))
 
             level_params['dt'] = dt
@@ -124,6 +142,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                 controller = controller_MPI(controller_params=controller_params, description=description, comm=controller_comm)
                 serial==False
 
+
             if(serial==True):
                 P = controller.S.levels[0].prob            
             else:    
@@ -136,7 +155,9 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             # call main function to get things done...
             MPI.COMM_WORLD.Barrier()            
             t1 = MPI.Wtime()
+            print("hier")
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+            print("hier2")            
             t2 = MPI.Wtime()          
             time =t2-t1   
             print( "My elapsed time is ", time)
@@ -147,7 +168,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             print( "Elapsed max time is ", maxtime[0])
 
 
-            if(True): #control the solution    
+            if(False): #control the solution    
                 fname = 'ref_24.npz'
                 loaded = np.load(fname)
                 uref = loaded['uend']
@@ -155,7 +176,8 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                 print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values-uend.values, np.inf))
 
 
-
+            plt.imshow(uend.values[0,:,:], interpolation='bilinear')
+            plt.savefig('foo2.pdf')
 
 
             # compute and print statistics
@@ -163,12 +185,12 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             iter_counts = sort_stats(filtered_stats, sortby='time')
             niters = np.array([item[1] for item in iter_counts])
             print("Iterationen SDC ", niters)
-            print("Newton Iterationen ", P.newton_itercount)
+            #print("Newton Iterationen ", P.newton_itercount)
 
-            maxcount = np.zeros(1, dtype='float64')
-            local_count = np.max(P.newton_itercount).astype('float64')
-            MPI.COMM_WORLD.Allreduce(local_count,maxcount, op=MPI.MAX)
-            print("maxiter ", maxcount[0])
+            #maxcount = np.zeros(1, dtype='float64')
+            #local_count = np.max(P.newton_itercount).astype('float64')
+            #MPI.COMM_WORLD.Allreduce(local_count,maxcount, op=MPI.MAX)
+            #print("maxiter ", maxcount[0])
 
 
  
@@ -181,7 +203,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                     #print("time for linear solve ", pp.levels[0].prob.time_for_solve)
             else:
 
-                print("Newton Iter ", controller.S.levels[0].prob.newton_itercount)
+                print("Newton Iter ") #, controller.S.levels[0].prob.newton_itercount)
                 #print("lineare Iter ", controller.S.levels[0].prob.linear_count)
                 #print("warning ", controller.S.levels[0].prob.warning_count)    
                 #print("time for linear solve ", controller.S.levels[0].prob.time_for_solve)

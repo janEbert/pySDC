@@ -245,7 +245,8 @@ class sweeper(object):
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
             else:
-                raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
+                0
+                #raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
@@ -286,8 +287,9 @@ class sweeper(object):
         elif L.params.residual_type == 'last_rel':
             L.status.residual = res_norm[-1] / abs(L.u[0])
         else:
-            raise ParameterError(f'residual_type = {L.params.residual_type} not implemented, choose '
-                                 f'full_abs, last_abs, full_rel or last_rel instead')
+            0
+            #raise ParameterError(f'residual_type = {L.params.residual_type} not implemented, choose '
+            #                     f'full_abs, last_abs, full_rel or last_rel instead')
 
         # indicate that the residual has seen the new values
         L.status.updated = False

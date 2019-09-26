@@ -4,7 +4,7 @@ from petsc4py import PETSc
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
-
+from mpi4py import MPI
 
 class GS_full(object):
     """
@@ -280,7 +280,7 @@ class petsc_grayscott_multiimplicit(ptype):
 
         # setup linear solver
         self.ksp = PETSc.KSP()
-        self.ksp.create(comm=self.params.comm)
+        self.ksp.create(comm=MPI.COMM_SELF)#self.params.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
         pc.setType('none')
@@ -506,7 +506,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
             dtype_u: PETSc data type (will be passed to parent class)
             dtype_f: PETSc data type (will be passed to parent class)
         """
-
+        print("im init")
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(petsc_grayscott_fullyimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
                                                             dtype_f=dtype_f)
@@ -522,7 +522,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         Returns:
             dtype_f: the RHS
         """
-
+        print("evalf")
         f = self.dtype_f(self.init)
         self.A.mult(u.values, f.values)
 
@@ -533,6 +533,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
                 fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
                 fa[i, j, 1] += xa[i, j, 0] * xa[i, j, 1] ** 2 - self.params.B * xa[i, j, 1]
 
+        print("evalfende")
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -549,6 +550,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
             dtype_u: solution as mesh
         """
 
+        print("im solve")
         me = self.dtype_u(u0)
         target = GS_full(self.init, self.params, factor, self.dx, self.dy)
 
