@@ -65,7 +65,7 @@ class grayscott_fullyimplicit(ptype):
         self.dx = 1.0 / self.params.nvars[1]
         self.A = self.__get_A(self.params.nvars, self.dx)
         self.xvalues = np.array([i * self.dx  for i in range(self.params.nvars[1])])
-        print("init ",self.xvalues)
+
 
         self.newton_itercount = 0
         self.lin_itercount = 0
@@ -231,7 +231,6 @@ class grayscott_fullyimplicit(ptype):
         for i in range(self.params.nvars[1]):
             for j in range(self.params.nvars[1]):            
                 if( (self.xvalues[i]-0.5)*(self.xvalues[i]-0.5) + (self.xvalues[j]-0.5)*(self.xvalues[j]-0.5) < 0.0025):
-                    print(0.5)
                     me.values[0,i, j] = 0.5
                     me.values[1,i, j] = 0.25
                 else:

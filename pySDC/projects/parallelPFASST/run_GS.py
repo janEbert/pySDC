@@ -155,9 +155,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             # call main function to get things done...
             MPI.COMM_WORLD.Barrier()            
             t1 = MPI.Wtime()
-            print("hier")
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-            print("hier2")            
             t2 = MPI.Wtime()          
             time =t2-t1   
             print( "My elapsed time is ", time)
