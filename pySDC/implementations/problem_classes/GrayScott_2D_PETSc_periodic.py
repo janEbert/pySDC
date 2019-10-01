@@ -6,6 +6,8 @@ from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
 from mpi4py import MPI
 
+import numpy as np
+
 class GS_full(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
@@ -314,6 +316,7 @@ class petsc_grayscott_multiimplicit(ptype):
         A.setPreallocationNNZ((5, 5))
         A.setUp()
 
+
         A.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
@@ -489,6 +492,9 @@ class petsc_grayscott_multiimplicit(ptype):
                 xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * i * self.dx / 100) *
                                               np.sin(np.pi * j * self.dy / 100), 100)
 
+        np.savez_compressed(file='anfangswerte.npz', u_0=me.values.getArray()) 
+        #print("anfangswerte gespeichert")
+        #exit()
         return me
 
 
@@ -506,7 +512,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
             dtype_u: PETSc data type (will be passed to parent class)
             dtype_f: PETSc data type (will be passed to parent class)
         """
-        print("im init")
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(petsc_grayscott_fullyimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
                                                             dtype_f=dtype_f)
@@ -522,18 +528,23 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         Returns:
             dtype_f: the RHS
         """
-        print("evalf")
+        #print(abs(u))
         f = self.dtype_f(self.init)
         self.A.mult(u.values, f.values)
+        #f.values *=0
 
         fa = self.init.getVecArray(f.values)
         xa = self.init.getVecArray(u.values)
+        
+        
+        
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
+                fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 +  self.params.A * (1 - xa[i, j, 0]) 
                 fa[i, j, 1] += xa[i, j, 0] * xa[i, j, 1] ** 2 - self.params.B * xa[i, j, 1]
 
-        print("evalfende")
+        #print("f", abs(f))
+        #exit()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -549,8 +560,10 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         Returns:
             dtype_u: solution as mesh
         """
+        #print("u0", abs(u0))
+        #print("rhs", abs(rhs))
 
-        print("im solve")
+
         me = self.dtype_u(u0)
         target = GS_full(self.init, self.params, factor, self.dx, self.dy)
 
@@ -561,6 +574,9 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         self.snes.setJacobian(target.formJacobian, J)
 
         self.snes.solve(rhs.values, me.values)
+
+        #print("me", abs(me))                
+        #exit()
 
         self.snes_ncalls += 1
         self.snes_itercount += self.snes.getIterationNumber()

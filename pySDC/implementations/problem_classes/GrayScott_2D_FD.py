@@ -9,6 +9,8 @@ import sys
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+import matplotlib.pyplot as plt
+
 
 class gmres_counter(object):
     def __init__(self, disp=False):
@@ -62,7 +64,9 @@ class grayscott_fullyimplicit(ptype):
 
         # compute dx and get discretization matrix A
         #self.nv = self.params.nvars[1]
-        self.dx = 1.0 / self.params.nvars[1]
+        self.dx = 1. / self.params.nvars[1]  ##################################################################################
+        #print(self.dx)
+        #exit()
         self.A = self.__get_A(self.params.nvars, self.dx)
         self.xvalues = np.array([i * self.dx  for i in range(self.params.nvars[1])])
 
@@ -115,7 +119,11 @@ class grayscott_fullyimplicit(ptype):
         Returns:
             dtype_u: solution u
         """
+        #print("u0", abs(u_0))
+        #print("rhs", abs(rhs))
+        #print("factor", abs(factor))                
 
+        
 	#print(u0.values.shape)
         u0 = self.dtype_u(u_0).values[0,:,:].flatten()
         u1 = self.dtype_u(u_0).values[1,:,:].flatten()   
@@ -177,13 +185,17 @@ class grayscott_fullyimplicit(ptype):
             self.time_for_solve += t2-t1 
             if counter.niter== self.params.lin_maxiter:
                 self.warning_count += 1          
-
+            u0=u.reshape(self.params.nvars)[0,:,:].flatten()
+            u1=u.reshape(self.params.nvars)[1,:,:].flatten()
             n += 1
 
 
         
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
+
+        #print("me", abs(me))                
+        #exit()
 
         self.newton_ncalls += 1
 
@@ -200,16 +212,22 @@ class grayscott_fullyimplicit(ptype):
         Returns:
             dtype_f: the RHS
         """
+        #print(abs(u))
         f = self.dtype_f(self.init)
         v0 = u.values[0,:,:].flatten()
         v1 = u.values[1,:,:].flatten()        
         
+        #print("abs ", abs(abs(- v0 * v1** 2 + self.params.f*(1-v0))))
         
-        f0 = self.params.D0*self.A.dot(v0) - v0 * v1** 2 + self.params.f*(1-v0)
-        f1 = self.params.D1*self.A.dot(v1) + v0 * v1** 2 - (self.params.f+self.params.k)*v1
+        #f0 = (- v0 * v1* v1)  + (1-v0)*self.params.f
+        #f1 = ( v0 * v1**2 - self.params.k*v1  )  # - (self.params.f+self.params.k)*v1
+        
+        f0 = self.params.D0*self.A.dot(v0) - v0 * v1**2 + self.params.f*(1-v0)
+        f1 = self.params.D1*self.A.dot(v1) + v0 * v1**2  - (self.params.f+self.params.k)*v1
         
         f.values[0,:,:] = f0.reshape([self.params.nvars[1], self.params.nvars[2]])
         f.values[1,:,:] = f1.reshape([self.params.nvars[1], self.params.nvars[2]])        
+
 
         return f
 
@@ -226,7 +244,30 @@ class grayscott_fullyimplicit(ptype):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
+
+        me = self.dtype_u(self.init)
+        dx = 1.0 / self.params.nvars[1]
+        #print(1.0 - 0.5 * np.power(np.sin(np.pi * 15 * dx / 100) *np.sin(np.pi * 14 * dx / 100), 100))
+        #print(1.0 - 0.5 * np.power(np.sin(np.pi * 14 * dx / 100) *np.sin(np.pi * 13 * dx / 100), 100))        
+        #exit()
         
+        #for i in range(self.params.nvars[1],self.params.nvars[1]):
+        #    for j in range(self.params.nvars[1],self.params.nvars[1]):
+        #        #print("laeut", 1.0 - 0.5 * np.power(np.sin(np.pi * i * dx / 100) *np.sin(np.pi * j * dx / 100), 100))
+        #        me.values[0, i, j] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * dx / 100) *np.sin(np.pi * j * dx / 100), 100)
+        #        me.values[1, i, j] = 0.25 * np.power(np.sin(np.pi * i * dx / 100) *np.sin(np.pi * j * dx / 100), 100)
+
+        #fname = 'anfangswerte.npz'
+        #loaded = np.load(fname) 
+        
+        #me.values[0,:,:] = loaded['u_0'].reshape(32,32,2)[:,:,0]
+        #me.values[1,:,:] = loaded['u_0'].reshape(32,32,2)[:,:,1]        
+
+        #plt.imshow(me.values[0,:,:], interpolation='bilinear')
+        #plt.savefig('anfangswertmsh.pdf')
+        #exit()                    
+        #print("zweites", me.values[0,14:17,14:17])        
+        #exit()
         #print(self.params.nvars[1])
         for i in range(self.params.nvars[1]):
             for j in range(self.params.nvars[1]):            

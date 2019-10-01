@@ -43,13 +43,13 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.5
+    level_params['dt'] = 1 #0.5
     level_params['nsweeps'] = [1]
     
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [4]
+    sweeper_params['num_nodes'] = [3] #[4]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'zero'
     sweeper_params['fixed_time_in_jacobian'] = 0
@@ -64,16 +64,16 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['D0'] = 1.0
-    problem_params['D1'] = 0.01
-    problem_params['f'] = 0.09
-    problem_params['k'] = 0.086
+    problem_params['D0'] = 1e-4#1.0
+    problem_params['D1'] = 1e-5#0.01
+    problem_params['f'] = 0.0367 #0.09
+    problem_params['k'] = 0.0649 #0.086
     problem_params['nvars'] = [(2,32,32),(2,16,16)] # [(128, 128),(64,64)]
     problem_params['nlsol_tol'] = 1E-10
     problem_params['nlsol_maxiter'] = 100
     problem_params['lsol_tol'] = 1E-10
     problem_params['lsol_maxiter'] = 100
-    problem_params['newton_maxiter'] = 1 
+    problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-11
     problem_params['lin_tol'] = 1E-12
     problem_params['lin_maxiter'] = 450 
@@ -102,7 +102,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     
     # setup parameters "in time"
     t0 = 0
-    Tend = 2
+    Tend = 8.
 
 
 
@@ -111,7 +111,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     for sweeper in sweeper_list:
         description['sweeper_class'] = sweeper
         error_reduction = []
-        for dt in [0.5]: #1e-3]:
+        for dt in [1.]: #0.5]: #1e-3]:
             print('Working with sweeper %s and dt = %s...' % (sweeper.__name__, dt))
 
             level_params['dt'] = dt
@@ -165,6 +165,16 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             MPI.COMM_WORLD.Allreduce(local_time,maxtime, op=MPI.MAX)           
             print( "Elapsed max time is ", maxtime[0])
 
+            if (MPI.COMM_WORLD.Get_rank()==0):
+                fname = 'neue32referenz.npz'
+                loaded = np.load(fname)            
+                uref = loaded['uend']
+            
+                print("erstes", uref.reshape([32,32,2])[14:17,14:17,0]  )
+                print("zweites", uend.values[0,14:17,14:17])
+                print("neue super abweichung vom persc wert ", np.linalg.norm(uref.reshape([32,32,2])[:,:,0]-uend.values[0,:,:], np.inf))            
+                print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values[0,:,:]-uend.values[0,:,:], np.inf))            
+
 
             if(False): #control the solution    
                 fname = 'ref_24.npz'
@@ -174,9 +184,10 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                 print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values-uend.values, np.inf))
 
 
-            plt.imshow(uend.values[0,:,:], interpolation='bilinear')
-            plt.savefig('foo2.pdf')
-
+            #plt.imshow(uend.values[0,:,:], interpolation='bilinear')
+            #plt.savefig(str(Tend)+'ruthmesh.pdf')
+            #plt.imshow(uref.reshape([32,32,2])[:,:,0], interpolation='bilinear')
+            #plt.savefig('endepython.pdf')
 
             # compute and print statistics
             filtered_stats = filter_stats(stats, type='niter')
@@ -220,7 +231,7 @@ def main():
 
  
     #PFASST nur Zeit Parallel 
-    #run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
+    run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
     
     #neue Versionen ABER seriell in den Knoten
     #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
@@ -231,6 +242,7 @@ def main():
     #MPI default communicator
     comm = MPI.COMM_WORLD    
     
+     
     #neue Versionen parallel in den Knoten, mit 4 Proz
     #world_rank = comm.Get_rank()
     #world_size = comm.Get_size()
@@ -268,7 +280,7 @@ def main():
     #print(node_list)
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=comm)
 
-    run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
+    #run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
     #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
 
