@@ -102,7 +102,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     
     # setup parameters "in time"
     t0 = 0
-    Tend = 8.
+    Tend = 24.
 
 
 
@@ -166,13 +166,13 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
             print( "Elapsed max time is ", maxtime[0])
 
             if (MPI.COMM_WORLD.Get_rank()==0):
-                fname = 'neue32referenz.npz'
-                loaded = np.load(fname)            
-                uref = loaded['uend']
+                #fname = 'neue32referenz.npz'
+                #loaded = np.load(fname)            
+                #uref = loaded['uend']
             
-                print("erstes", uref.reshape([32,32,2])[14:17,14:17,0]  )
-                print("zweites", uend.values[0,14:17,14:17])
-                print("neue super abweichung vom persc wert ", np.linalg.norm(uref.reshape([32,32,2])[:,:,0]-uend.values[0,:,:], np.inf))            
+                #print("erstes", uref.reshape([32,32,2])[14:17,14:17,0]  )
+                #print("zweites", uend.values[0,14:17,14:17])
+                #print("neue super abweichung vom persc wert ", np.linalg.norm(uref.reshape([32,32,2])[:,:,0]-uend.values[0,:,:], np.inf))            
                 print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values[0,:,:]-uend.values[0,:,:], np.inf))            
 
 
