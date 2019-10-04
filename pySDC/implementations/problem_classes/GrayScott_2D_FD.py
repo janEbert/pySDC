@@ -160,19 +160,22 @@ class grayscott_fullyimplicit(ptype):
                 break
 
 
-            dg=np.zeros([2*self.params.nvars[1]*self.params.nvars[1], 2*self.params.nvars[1]*self.params.nvars[1]])
+            #dg=np.zeros([2*self.params.nvars[1]*self.params.nvars[1], 2*self.params.nvars[1]*self.params.nvars[1]])
             
+            #dg[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]] += (Id - factor * (self.params.D0*self.A + sp.diags((-u1 ** 2 -self.params.f), offsets=0))) #00
 
-
-            dg[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]] += (Id - factor * (self.params.D0*self.A + sp.diags((-u1 ** 2 -self.params.f), offsets=0))) #00
-
-            dg[:self.params.nvars[1]*self.params.nvars[1], self.params.nvars[1]*self.params.nvars[1]:] += - factor * (sp.diags(( -2.0*u0*u1 ), offsets=0)) #01            
+            #dg[:self.params.nvars[1]*self.params.nvars[1], self.params.nvars[1]*self.params.nvars[1]:] += - factor * (sp.diags(( -2.0*u0*u1 ), offsets=0)) #01            
             
-            dg[self.params.nvars[1]*self.params.nvars[1]:, self.params.nvars[1]*self.params.nvars[1]:] += (Id - factor * (self.params.D1*self.A + sp.diags((2.0*u0*u1-(self.params.f+self.params.k)), offsets=0))) #11
+            #dg[self.params.nvars[1]*self.params.nvars[1]:, self.params.nvars[1]*self.params.nvars[1]:] += (Id - factor * (self.params.D1*self.A + sp.diags((2.0*u0*u1-(self.params.f+self.params.k)), offsets=0))) #11
             
-            dg[self.params.nvars[1]*self.params.nvars[1]:, :self.params.nvars[1]*self.params.nvars[1]] +=  - factor *  sp.diags(u1**2, offsets=0) #10           
+            #dg[self.params.nvars[1]*self.params.nvars[1]:, :self.params.nvars[1]*self.params.nvars[1]] +=  - factor *  sp.diags(u1**2, offsets=0) #10           
 
 
+            dg = sp.bmat([[(Id - factor * (self.params.D0*self.A + sp.diags((-u1 ** 2 -self.params.f), offsets=0))), - factor * (sp.diags(( -2.0*u0*u1 ), offsets=0))],[- factor *  sp.diags(u1**2, offsets=0), (Id - factor * (self.params.D1*self.A + sp.diags((2.0*u0*u1-(self.params.f+self.params.k)), offsets=0))) ]])
+
+
+            #print("das system dg gray sott", dg)
+            #print("is it", sp.issparse(dg))
         
             t1 = MPI.Wtime()  
                                 

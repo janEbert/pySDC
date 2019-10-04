@@ -200,7 +200,7 @@ def main():
 
  
     #PFASST nur Zeit Parallel 
-    #run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
+    run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
     
     #neue Versionen ABER seriell in den Knoten
     #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
@@ -248,7 +248,7 @@ def main():
     #print(node_list)
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=comm)
 
-    run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
+    #run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
     #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
 
