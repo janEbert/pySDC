@@ -49,7 +49,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3] #[4]
+    sweeper_params['num_nodes'] = [4] #[4]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'zero'
     sweeper_params['fixed_time_in_jacobian'] = 0
@@ -77,7 +77,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     problem_params['newton_tol'] = 1E-11
     problem_params['lin_tol'] = 1E-12
     problem_params['lin_maxiter'] = 450 
-    problem_params['comm'] = MPI.COMM_SELF   #node_comm 
+    problem_params['comm'] = node_comm 
 
 
     # initialize controller parameters
@@ -231,7 +231,7 @@ def main():
 
  
     #PFASST nur Zeit Parallel 
-    run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
+    #run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
     
     #neue Versionen ABER seriell in den Knoten
     #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
@@ -280,7 +280,7 @@ def main():
     #print(node_list)
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=comm)
 
-    #run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
+    run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
     #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
 
