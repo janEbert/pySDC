@@ -43,7 +43,7 @@ class GS_jac(grayscott_fullyimplicit):
         dfdu11 = self.params.D1*self.A                        
         
 
-        dfdu = sp.bmat([[dfdu00-sp.diags(u.values[1,:,:].flatten()**2 - 1.0 * self.params.f, offsets=0), sp.diags(u.values[1,:,:].flatten()**2, offsets=0)],[sp.diags(-2*u.values[0,:,:].flatten() *u.values[1,:,:].flatten(), offsets=0), dfdu11+sp.diags(2.0* u.values[0,:,:].flatten() * u.values[1,:,:].flatten() -1.0 *(self.params.f +self.params.k), offsets=0)]])   
+        dfdu = sp.bmat([[dfdu00-sp.diags(u.values[1,:,:].flatten()**2 - 1.0 * self.params.f, offsets=0), sp.diags(-2*u.values[0,:,:].flatten() *u.values[1,:,:].flatten(), offsets=0)],[sp.diags(u.values[1,:,:].flatten()**2, offsets=0), dfdu11+sp.diags(2.0* u.values[0,:,:].flatten() * u.values[1,:,:].flatten() -1.0 *(self.params.f +self.params.k), offsets=0)]])   
               
         #dfdu[:self.params.nvars[1]*self.params.nvars[1], :self.params.nvars[1]*self.params.nvars[1]] += (dfdu00)
         #dfdu[self.params.nvars[1]*self.params.nvars[1]:, self.params.nvars[1]*self.params.nvars[1]:] += (dfdu11)        
