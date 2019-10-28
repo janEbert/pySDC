@@ -250,9 +250,7 @@ class grayscott_fullyimplicit(ptype):
 
         me = self.dtype_u(self.init)
         dx = 1.0 / self.params.nvars[1]
-        #print(1.0 - 0.5 * np.power(np.sin(np.pi * 15 * dx / 100) *np.sin(np.pi * 14 * dx / 100), 100))
-        #print(1.0 - 0.5 * np.power(np.sin(np.pi * 14 * dx / 100) *np.sin(np.pi * 13 * dx / 100), 100))        
-        #exit()
+
         
         #for i in range(self.params.nvars[1],self.params.nvars[1]):
         #    for j in range(self.params.nvars[1],self.params.nvars[1]):
@@ -272,6 +270,7 @@ class grayscott_fullyimplicit(ptype):
         #print("zweites", me.values[0,14:17,14:17])        
         #exit()
         #print(self.params.nvars[1])
+        
         for i in range(self.params.nvars[1]):
             for j in range(self.params.nvars[1]):            
                 if( (self.xvalues[i]-0.5)*(self.xvalues[i]-0.5) + (self.xvalues[j]-0.5)*(self.xvalues[j]-0.5) < 0.0025):

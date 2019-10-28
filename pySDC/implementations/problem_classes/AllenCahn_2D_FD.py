@@ -124,6 +124,7 @@ class allencahn_fullyimplicit(ptype):
             # assemble dg
             dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
 
+            print("dg allen", dg)
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
             u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
@@ -244,6 +245,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         me = self.dtype_u(self.init)
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+
+        print("das system dg allen cahn", Id - factor * self.A)
 
         me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
                        maxiter=self.params.lin_maxiter, callback=callback)[0]

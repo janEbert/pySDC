@@ -35,7 +35,7 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'
-    sweeper_params['fixed_time_in_jacobian'] = 0
+    sweeper_params['fixed_time_in_jacobian'] = 1 #0
 
     # initialize controller parameters
     controller_params = dict()
@@ -52,6 +52,8 @@ def main():
     # setup parameters "in time"
     t0 = 0
     Tend = 0.1
+
+    print("teste")
 
     sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel, linearized_implicit_fixed_parallel_prec]
     dt_list = [Tend / 2 ** i for i in range(1, 5)]
@@ -97,6 +99,9 @@ def main():
     file = open('data/error_reduction_data.pkl', 'wb')
     pickle.dump(results, file)
     file.close()
+
+if __name__ == "__main__":
+    main()
 
 
 def plot_graphs(cwd=''):

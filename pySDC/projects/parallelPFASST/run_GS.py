@@ -11,30 +11,34 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
 
-#from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott_fullyimplicit #GS_jac
-#from pySDC.implementations.problem_classes.GrayScott_2D_FD import grayscott_fullyimplicit
+
 
 from pySDC.projects.parallelPFASST.GS_2D_FD_implicit_Jac import GS_jac
 
+from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
+from pySDC.projects.parallelPFASST.div_linearized_implicit_fixed_parallel_MPI      import div_linearized_implicit_fixed_parallel_MPI
 
-#from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
-#from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
 
-#from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-#from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
 
-#from pySDC.projects.parallelSDC.div_linearized_implicit_fixed_parallel_MPI import div_linearized_implicit_fixed_parallel_MPI
-#from pySDC.projects.parallelSDC.div_linearized_implicit_fixed_parallel_prec_MPI import div_linearized_implicit_fixed_parallel_prec_MPI
+from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
+from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
+from pySDC.projects.parallelPFASST.div_linearized_implicit_fixed_parallel_prec_MPI import div_linearized_implicit_fixed_parallel_prec_MPI
+
+
+
+
+
 
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_MPI
-#from pySDC.projects.parallelSDC.div_BaseTransfer_MPI import div_base_transfer_MPI
+from pySDC.projects.parallelPFASST.div_BaseTransfer_MPI import div_base_transfer_MPI
+
 import matplotlib.pyplot as plt
 
 
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
-#from pySDC.projects.parallelSDC.div_generic_implicit_MPI import div_generic_implicit_MPI
+
 from mpi4py import MPI
 
 def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=None, node_list=None):
@@ -102,7 +106,7 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
     
     # setup parameters "in time"
     t0 = 0
-    Tend = 24.
+    Tend = 8.
 
 
 
@@ -173,7 +177,9 @@ def run(sweeper_list, MPI_fake=True, controller_comm=MPI.COMM_WORLD, node_comm=N
                 #print("erstes", uref.reshape([32,32,2])[14:17,14:17,0]  )
                 #print("zweites", uend.values[0,14:17,14:17])
                 #print("neue super abweichung vom persc wert ", np.linalg.norm(uref.reshape([32,32,2])[:,:,0]-uend.values[0,:,:], np.inf))            
-                print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values[0,:,:]-uend.values[0,:,:], np.inf))            
+                print("Abweichung vom Anfangswert ", np.linalg.norm(uinit.values[0,:,:]-uend.values[0,:,:], np.inf)) 
+                np.save("u_values", uend.values[0,:,:])
+                np.save("v_values", uend.values[1,:,:])                  
 
 
             if(False): #control the solution    
@@ -235,6 +241,8 @@ def main():
     
     #neue Versionen ABER seriell in den Knoten
     #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
+    
+    run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=MPI.COMM_WORLD) 
  
  
@@ -280,8 +288,8 @@ def main():
     #print(node_list)
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=comm)
 
-    run([linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
-    #run([div_linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
+    #run([div_linearized_implicit_fixed_parallel_MPI], controller_comm=time_comm, node_comm=node_comm)  
+    #run([linearized_implicit_fixed_parallel_prec_MPI], MPI_fake=False, controller_comm=time_comm, node_comm=node_comm)  
 
 
 

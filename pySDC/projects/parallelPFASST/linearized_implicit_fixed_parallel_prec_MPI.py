@@ -1,13 +1,11 @@
 import numpy as np
 from mpi4py import MPI
-from pySDC.projects.parallelPFASST.linearized_implicit_parallel_MPI import linearized_implicit_parallel_MPI
+from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
 
 
-class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
+class linearized_implicit_fixed_parallel_prec_MPI(linearized_implicit_fixed_parallel_MPI):
     """
     Custom sweeper class, implements Sweeper.py
-
-    Generic implicit sweeper, expecting lower triangular matrix QI as input
 
     Attributes:
         D: eigenvalues of the QI
@@ -20,19 +18,21 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
         Args:
             params: parameters for the sweeper
         """
-        
+
         if 'fixed_time_in_jacobian' not in params:
             params['fixed_time_in_jacobian'] = 0
 
+        # call parent's initialization routine
         super(linearized_implicit_fixed_parallel_MPI, self).__init__(params)
 
         assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes + 1), \
             "ERROR: fixed_time_in_jacobian is too small or too large, got %s" % self.params.fixed_time_in_jacobian
 
-        self.D, self.V = np.linalg.eig(self.coll.Qmat[1:, 1:])
+	#print(self.QI[1:, 1:])
+        self.D, self.V = np.linalg.eig(self.QI[1:, 1:])
         self.Vi = np.linalg.inv(self.V)
-        self.newton_itercount = 0
-        
+
+
 
     def update_nodes(self):
         """
@@ -45,6 +45,8 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
         L = self.level
         P = L.prob
 
+        #print("my rank ")
+        #print(self.rank )
         # only if the level has been touched before
         assert L.status.unlocked
 
@@ -66,10 +68,12 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
 
 
         Gu_global = np.zeros( M * Gu.values.size, dtype='d')
-   
-        Guv = np.zeros( Gu.values.size, dtype=complex)#complex) #dtype='d')
-        
-        #Guv2 = Guv2.astype(complex)  
+
+
+      
+
+        Guv = np.zeros( Gu.values.size, dtype='d')
+
         for m in range(self.coll.num_nodes):
             if m == self.rank:
                 self.params.comm.Reduce(self.Vi[m, self.rank] * Gu.values ,
@@ -79,15 +83,13 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
                                         None, root=m, op=MPI.SUM)
 
         Guv = Guv.astype(complex)      
-
         
 
         t1 = MPI.Wtime()  
         uv = P.solve_system_jacobian(dfdu, Guv, L.dt * self.D[self.rank], L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
         t2 = MPI.Wtime()             
 
-
-        U = np.zeros( Gu.values.size, dtype=complex)#.flattten()
+        U = np.zeros( Gu.values.size, dtype=complex)
 
 
         for m in range(self.coll.num_nodes):
@@ -98,13 +100,10 @@ class linearized_implicit_fixed_parallel_MPI(linearized_implicit_parallel_MPI):
             else:
                 self.params.comm.Reduce(U.astype(float), None, root=m, op=MPI.SUM)
 
-
-
-
         L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
 
 
 
-        # indicate presence of new values at this level
+
         L.status.updated = True
-        return None
+        return None        

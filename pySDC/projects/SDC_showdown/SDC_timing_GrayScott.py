@@ -13,7 +13,7 @@ from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import pe
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-
+import matplotlib.pyplot as plt
 
 def setup_parameters():
     """
@@ -47,7 +47,7 @@ def setup_parameters():
     problem_params['Dv'] = 0.01
     problem_params['A'] = 0.09
     problem_params['B'] = 0.086
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(32,32)] #[(128, 128)]
     problem_params['nlsol_tol'] = 1E-10
     problem_params['nlsol_maxiter'] = 100
     problem_params['lsol_tol'] = 1E-10
@@ -120,7 +120,7 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 2000.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -131,6 +131,17 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+         #VecGetArrays
+    neu = uend.values.getArray()
+    np.savez_compressed(file=str(Tend)+'petsc.npz', uend=neu)    
+    #neu = uend.values.VecGetArray() 
+    print("abw afw", abs(uend-uinit))
+    plt.imshow(neu.reshape([32,32,2])[:,:,0], interpolation='bilinear')
+    plt.savefig(str(Tend)+'mesh.pdf')
+    exit()
+    fname = 'ref_24.npz'
+    np.savez_compressed(file=fname, uend=uend.values)
+
 
     # load reference solution to compare with
     fname = cwd + 'data/GS_reference.dat'
@@ -203,6 +214,8 @@ def show_results(fname):
     # save plot, beautify
     plt_helper.savefig(fname)
 
+
+
     assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
     assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
@@ -265,6 +278,8 @@ def run_reference():
     fname = 'data/GS_reference.dat'
     viewer = PETSc.Viewer().createBinary(fname, 'w')
     viewer.view(uend.values)
+    
+
 
     assert os.path.isfile(fname), 'ERROR: PETSc did not create file'
 
@@ -278,13 +293,12 @@ def main(cwd=''):
     Args:
         cwd (str): current working directory (need this for testing)
     """
-
+    #run_reference()
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['fully-implicit', 'multi-implicit', 'semi-implicit']:
-
+    for variant in ['fully-implicit']: #, 'multi-implicit', 'semi-implicit']:
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False, cwd=cwd)
-        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True, cwd=cwd)
+        #results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True, cwd=cwd)
 
     # dump result
     fname = 'data/timings_SDC_variants_GrayScott'

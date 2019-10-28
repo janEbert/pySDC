@@ -33,6 +33,10 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         self.D, self.V = np.linalg.eig(self.coll.Qmat[1:, 1:])
         self.Vi = np.linalg.inv(self.V)
 
+
+
+
+
     def update_nodes(self):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
@@ -59,20 +63,34 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         Gu = self.integrate()
         for m in range(M):
             Gu[m] -= L.u[m + 1] - L.u[0]
+            if L.tau[m] is not None:
+               Gu[m] += L.tau[m]
 
         # transform collocation problem forward
         Guv = []
+        #initial = []
         for m in range(M):
-            Guv.append(P.dtype_u(P.init, val=0.0))
+            Guv.append(P.dtype_u(P.init, val=0))
+            #initial.append(P.dtype_u(P.init, val=0))
             for j in range(M):
                 Guv[m] += self.Vi[m, j] * Gu[j]
+                #initial[m] += self.Vi[m,j] * 
+                
+        
 
         # solve implicit system with Jacobian (just this one, does not change with the nodes)
         uv = []
         for m in range(M):  # hell yeah, this is parallel!!
-            uv.append(
-                P.solve_system_jacobian(dfdu, Guv[m], L.dt * self.D[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]))
-
+            #if m>0:
+            #    neu = P.solve_system_jacobian(dfdu, Guv[m].values, L.dt * self.D[m], uv[m-1], L.time + L.dt * self.coll.nodes[m])
+            #else:
+            #    neu = P.solve_system_jacobian(dfdu, Guv[m].values, L.dt * self.D[m], L.u[m+1], L.time + L.dt * self.coll.nodes[m])
+            #uv.append(neu)
+            uv.append(P.solve_system_jacobian(dfdu, Guv[m].values, L.dt * self.D[m], L.u[0], L.time + L.dt * self.coll.nodes[m]))
+            #print(uv[m].values)
+                #P.solve_system_jacobian(dfdu, Guv[m].values, L.dt * self.D[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]))
+        
+        
         # transform soultion backward
         for m in range(M):
             for j in range(M):
@@ -86,3 +104,4 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         L.status.updated = True
 
         return None
+

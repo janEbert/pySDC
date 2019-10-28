@@ -90,7 +90,18 @@ class GS_jac(grayscott_fullyimplicit):
         t1 = MPI.Wtime()              
         #new = spsolve(mat, rhs.flatten()) #.values.flatten()) 
         ###nnn =      cg(mat, rhs.flatten(), x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)
-        nnn =   gmres(mat, rhs.flatten(), x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)
+        
+        
+        #print("########################################################################")
+        #print(type(rhs))
+        #exit()
+        
+        #if not(isinstance(rhs, np.ndarray)): #if (type(rhs.dtype) == <type 'np.ndarray'>):
+        #    rhs = rhs.values
+        
+        nnn =   gmres(mat, rhs.flatten(), x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)   ## ruth
+        #nnn =   gmres(mat, rhs.values.flatten(), x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter, callback=counter)
+        #print("################################### das hat geklappt")
         new = nnn[0]
         t2 = MPI.Wtime()             
         #print( "solve system ")    

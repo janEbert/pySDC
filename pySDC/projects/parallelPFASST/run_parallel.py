@@ -15,17 +15,17 @@ from pySDC.projects.parallelPFASST.AC_2D_FD_implicit_Jac import AC_jac
 
 
 from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_MPI import linearized_implicit_fixed_parallel_MPI
-#from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
+from pySDC.projects.parallelPFASST.linearized_implicit_fixed_parallel_prec_MPI import linearized_implicit_fixed_parallel_prec_MPI
 
 #from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 #from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
 
-#from pySDC.projects.parallelSDC.div_linearized_implicit_fixed_parallel_MPI import div_linearized_implicit_fixed_parallel_MPI
-#from pySDC.projects.parallelSDC.div_linearized_implicit_fixed_parallel_prec_MPI import div_linearized_implicit_fixed_parallel_prec_MPI
+from pySDC.projects.parallelPFASST.div_linearized_implicit_fixed_parallel_MPI      import div_linearized_implicit_fixed_parallel_MPI
+from pySDC.projects.parallelPFASST.div_linearized_implicit_fixed_parallel_prec_MPI import div_linearized_implicit_fixed_parallel_prec_MPI
 
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_MPI
-#from pySDC.projects.parallelSDC.div_BaseTransfer_MPI import div_base_transfer_MPI
+from pySDC.projects.parallelPFASST.BaseTransfer_MPI import base_transfer_MPI
+from pySDC.projects.parallelPFASST.div_BaseTransfer_MPI import div_base_transfer_MPI
 import matplotlib.pyplot as plt
 
 
@@ -200,10 +200,10 @@ def main():
 
  
     #PFASST nur Zeit Parallel 
-    run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
+    #run([generic_implicit], controller_comm=MPI.COMM_WORLD) 
     
     #neue Versionen ABER seriell in den Knoten
-    #run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
+    run([linearized_implicit_fixed_parallel], controller_comm=MPI.COMM_WORLD)    
     #run([linearized_implicit_fixed_parallel_prec], controller_comm=MPI.COMM_WORLD) 
  
  
@@ -232,11 +232,11 @@ def main():
     world_rank = comm.Get_rank()
     world_size = comm.Get_size()
 
-    color = int(world_rank / 4) 
+    color = int(world_rank / 2) 
     node_comm = comm.Split(color=color)
     node_rank = node_comm.Get_rank()
 
-    color = int(world_rank % 4) 
+    color = int(world_rank % 2) 
     time_comm = comm.Split(color=color)
     time_rank = time_comm.Get_rank()
     

@@ -29,6 +29,7 @@ class AC_jac(allencahn_fullyimplicit):
             Jacobian matrix
         """
 
+        #print(u.values)
         v = u.values.flatten()
         
         self.A.dot(v) + 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
