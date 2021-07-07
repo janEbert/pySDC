@@ -1,0 +1,2580 @@
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 2.3218 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 2.1908 sec.
+
+Running with ml=True and num_procs=1...
+   Min/Mean/Max number of iterations: 5.00 / 6.60 / 8.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 -- 16
+   Std and var for number of iterations: 1.07 -- 1.14
+Error: 1.1316e-05
+Time to solution: 2.1807 sec.
+
+Running with ml=True and num_procs=1...
+   Min/Mean/Max number of iterations: 4.00 / 5.95 / 8.00
+   Range of values for number of iterations:  4 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 1.02 -- 1.05
+Error: 4.1744e-06
+Time to solution: 2.0751 sec.
+
+Running with ml=True and num_procs=10...
+   Min/Mean/Max number of iterations: 7.00 / 12.45 / 18.00
+   Range of values for number of iterations: 11 
+   Position of max/min number of iterations:  9 -- 10
+   Std and var for number of iterations: 3.11 -- 9.65
+Error: 1.1306e-05
+Time to solution: 4.5436 sec.
+
+Running with ml=True and num_procs=10...
+   Min/Mean/Max number of iterations: 6.00 / 11.50 / 17.00
+   Range of values for number of iterations: 11 
+   Position of max/min number of iterations:  9 -- 10
+   Std and var for number of iterations: 3.04 -- 9.25
+Error: 4.1688e-06
+Time to solution: 4.5546 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 1.6905 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 1.4893 sec.
+
+Running with ml=True and num_procs=1...
+   Min/Mean/Max number of iterations: 5.00 / 6.60 / 8.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 -- 16
+   Std and var for number of iterations: 1.07 -- 1.14
+Error: 1.1316e-05
+Time to solution: 1.7491 sec.
+
+Running with ml=True and num_procs=1...
+   Min/Mean/Max number of iterations: 4.00 / 5.95 / 8.00
+   Range of values for number of iterations:  4 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 1.02 -- 1.05
+Error: 4.1744e-06
+Time to solution: 1.6596 sec.
+
+Running with ml=True and num_procs=10...
+   Min/Mean/Max number of iterations: 7.00 / 12.45 / 18.00
+   Range of values for number of iterations: 11 
+   Position of max/min number of iterations:  9 -- 10
+   Std and var for number of iterations: 3.11 -- 9.65
+Error: 1.1306e-05
+Time to solution: 3.7794 sec.
+
+Running with ml=True and num_procs=10...
+   Min/Mean/Max number of iterations: 6.00 / 11.50 / 17.00
+   Range of values for number of iterations: 11 
+   Position of max/min number of iterations:  9 -- 10
+   Std and var for number of iterations: 3.04 -- 9.25
+Error: 4.1688e-06
+Time to solution: 3.6240 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 1.7492 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 3.0008 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 2.9598 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 2.5400 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 2.9664 sec.
+
+Running with ml=False and num_procs=1...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 2.5097 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 7.1136 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 5.9007 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 7.2654 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 5.3057 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 9.1391 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 6.6117 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 8.2703 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 8.6664 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 6.9993 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 11.0488 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 8.4302 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 10.0943 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 9.3573 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 5.1023 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 9.1519 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 8.7923 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 13.8818 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 20.4188 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 17.7206 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 15.1942 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 0.00 / 2.50 / 50.00
+   Range of values for number of iterations: 50 
+   Position of max/min number of iterations:  0 --  1
+   Std and var for number of iterations: 10.90 -- 118.75
+Error: 8.5525e-01
+Time to solution: 1.2645 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 0.00 / 2.50 / 50.00
+   Range of values for number of iterations: 50 
+   Position of max/min number of iterations:  0 --  1
+   Std and var for number of iterations: 10.90 -- 118.75
+Error: 8.5525e-01
+Time to solution: 0.9191 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 8.5525e-01
+Time to solution: 13.3416 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 8.5525e-01
+Time to solution: 15.6647 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 17.00 / 41.95 / 50.00
+   Range of values for number of iterations: 33 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 11.58 -- 134.05
+Error: 1.1283e-05
+Time to solution: 13.4691 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 14.7090 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.3904 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 13.8676 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 0.00 / 2.50 / 50.00
+   Range of values for number of iterations: 50 
+   Position of max/min number of iterations:  0 --  1
+   Std and var for number of iterations: 10.90 -- 118.75
+Error: 8.5525e-01
+Time to solution: 0.9782 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.0454 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.9104 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.8404 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 6.7739 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.1006 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 6.4127 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 7.7365 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 6.2790 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 10.5406 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 7.6559 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 8.7919 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 8.6658 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 9.2060 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 7.2205 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 11.6127 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 9.0609 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 8.1725 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 10.6997 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 10.4301 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 7.5387 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 9.6136 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 7.5667 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 8.8574 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 6.9598 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 9.0761 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1664e-06
+Time to solution: 7.1750 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1321e-05
+Time to solution: 7.7908 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1749e-06
+Time to solution: 7.2384 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1304e-05
+Time to solution: 14.9495 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1270e-05
+Time to solution: 3.3939 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 5.0212 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1287e-05
+Time to solution: 1.8807 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.7069 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1270e-05
+Time to solution: 4.5661 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 3.5043 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1287e-05
+Time to solution: 2.3509 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 3.1546 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 45.00 / 49.65 / 50.00
+   Range of values for number of iterations:  5 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 1.15 -- 1.33
+Error: 2.1871e-05
+Time to solution: 8.4990 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 45.00 / 49.65 / 50.00
+   Range of values for number of iterations:  5 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 1.15 -- 1.33
+Error: 2.1871e-05
+Time to solution: 4.9240 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 45.00 / 49.65 / 50.00
+   Range of values for number of iterations:  5 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 1.15 -- 1.33
+Error: 2.1871e-05
+Time to solution: 9.1475 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 2.3281e-02
+Time to solution: 8.0343 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 3.0573 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1270e-05
+Time to solution: 6.4398 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1287e-05
+Time to solution: 1.9156 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.5346 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 3.7629 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1270e-05
+Time to solution: 3.7974 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 3.8291 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 30.35 / 50.00
+   Range of values for number of iterations: 42 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 17.01 -- 289.33
+Error: 1.1270e-05
+Time to solution: 6.2319 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 12.70 / 16.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.10 -- 4.41
+Error: 1.1287e-05
+Time to solution: 2.1100 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.2733 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 4.8592 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.9328 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 50.00 / 50.00 / 50.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 2.3281e-02
+Time to solution: 3.6897 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 3.6022 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 27.05 / 50.00
+   Range of values for number of iterations: 43 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 17.38 -- 301.95
+Error: 4.1428e-06
+Time to solution: 2.2589 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.5444 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 2.1700 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.3162 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 2.4172 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.8688 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 2.3067 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.8262 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.2898 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.6961 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 10.7909 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 10.4224 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.2911 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.7886 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.8256 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.4777 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 2.0077 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 4.5413 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.2927 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.2023 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 11.1890 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 7.3765 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 3.3165 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.3126 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.1170 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.5336 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.0771 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.0889 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.9793 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.2198 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.1536 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.1035 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 10.3840 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error: 9.9874e-01
+Time to solution: 8.4042 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.0190 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.8126 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.5774 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.8927 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4134 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.6405 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.6010 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0573 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.5091 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0484 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.4212 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0495 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.7847 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.4231 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0217 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.6883 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3851 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9978 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.4225 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3672 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8817 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.4604 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4116 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0471 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.80 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.40 -- 5.76
+Error: 4.1493e-06
+Time to solution: 0.5361 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3970 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.6088 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1501e-06
+Time to solution: 0.7816 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3939 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9215 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 3.1394 sec.
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1503e-06
+Time to solution: 0.6717 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3945 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.6183 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1503e-06
+Time to solution: 0.7766 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4398 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0618 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1503e-06
+Time to solution: 0.6130 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4048 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0647 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1501e-06
+Time to solution: 0.8061 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3823 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9881 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1501e-06
+Time to solution: 0.4376 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3963 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0588 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1501e-06
+Time to solution: 0.9860 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4056 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9858 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.90 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 18
+   Std and var for number of iterations: 2.39 -- 5.69
+Error: 4.1501e-06
+Time to solution: 0.4182 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3790 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9936 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.80 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.19 -- 51.76
+Error: 4.1452e-06
+Time to solution: 0.5222 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.3966 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9783 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.80 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.19 -- 51.76
+Error: 4.1452e-06
+Time to solution: 2.1903 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 1.1612 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9601 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.7210 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4120 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9649 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.7452 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.25 / 16.00
+   Range of values for number of iterations:  6 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.19 -- 4.79
+Error: 4.1507e-06
+Time to solution: 0.4105 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9645 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.6029 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8568 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.2827 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4369 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9013 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9043 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4074 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9334 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.6560 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 100.00 / 100.00 / 100.00
+   Range of values for number of iterations:  0 
+   Position of max/min number of iterations:  0 --  0
+   Std and var for number of iterations: 0.00 -- 0.00
+Error:    nan
+Time to solution: 2.8505 sec.
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4694 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 1.0681 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.1054 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.6926 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9040 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9847 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.5440 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 1.2142 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.1214 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4039 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9093 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9837 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.6338 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9743 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0053 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.9262 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9886 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9531 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4319 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8910 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0032 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4373 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 1.1685 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.1461 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4246 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9535 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0689 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 1.0461 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9375 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.6683 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4600 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9997 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.1421 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.5703 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9805 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9286 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.8355 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9526 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9553 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.6182 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9574 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.1399 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.5375 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9200 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9248 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.5713 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8425 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9575 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 17.95 / 31.00
+   Range of values for number of iterations: 21 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 7.62 -- 58.05
+Error: 4.1452e-06
+Time to solution: 0.8980 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8854 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9621 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.9198 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8815 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9604 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4446 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8718 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0404 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4850 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9722 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9793 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.5360 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9099 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0902 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3990 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9038 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9511 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4144 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9777 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 1.0899 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4248 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8546 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9867 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3984 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8883 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9771 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3999 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8817 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.6722 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3981 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8693 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8747 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4106 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 1.0271 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.9299 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4111 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9254 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8600 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3932 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.9134 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8426 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.9843 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 2.0906 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 2.3332 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8171 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8442 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 7.00 / 28.35 / 59.00
+   Range of values for number of iterations: 52 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 19.22 -- 369.43
+Error: 4.1428e-06
+Time to solution: 0.8632 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.4001 sec.
+
+Running with ml=False and num_procs=6...
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 13.50 / 17.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 17
+   Std and var for number of iterations: 2.36 -- 5.55
+Error: 4.1480e-06
+Time to solution: 0.3955 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8411 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 11.40 / 15.00
+   Range of values for number of iterations:  7 
+   Position of max/min number of iterations:  0 -- 19
+   Std and var for number of iterations: 2.03 -- 4.14
+Error: 4.1514e-06
+Time to solution: 0.8070 sec.
+
