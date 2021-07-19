@@ -212,11 +212,20 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         print(out)
 
     # instantiate controller
+
+    MPI.COMM_WORLD.Barrier()    
+    wt = MPI.Wtime()
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
-    # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    MPI.COMM_WORLD.Barrier()    
+    wt = MPI.Wtime() - wt
+
 
     if False:
         plt.subplot(221)
@@ -224,9 +233,6 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         plt.imshow(Z, interpolation='bilinear')
         plt.title('initial')
         plt.colorbar()
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     if False:
         plt.subplot(222)
@@ -314,6 +320,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         if np.mean(niters) > maxmean:
             print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
 
+        print("TIME", wt)
         f.write('\n')
         print()
         f.close()
