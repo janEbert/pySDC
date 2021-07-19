@@ -1803,3 +1803,66 @@ Error: 2.8163e-08
 Abw: 2.4991e-01
 Time to solution: 0.3821 sec.
 
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 10.20 / 12.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  7
+   Std and var for number of iterations: 0.98 -- 0.96
+Error: 2.8163e-08
+Abw: 2.4991e-01
+Time to solution: 0.1525 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 11.50 / 13.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  8
+   Std and var for number of iterations: 1.02 -- 1.05
+Error: 2.8162e-08
+Abw: 2.4991e-01
+Time to solution: 0.1306 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 9.40 / 11.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  9
+   Std and var for number of iterations: 0.92 -- 0.84
+Error: 2.8163e-08
+Abw: 2.4991e-01
+Time to solution: 0.0934 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 10.20 / 12.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  7
+   Std and var for number of iterations: 0.98 -- 0.96
+Error: 2.8163e-08
+Abw: 2.4991e-01
+Time to solution: 0.1501 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 10.00 / 11.50 / 13.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  8
+   Std and var for number of iterations: 1.02 -- 1.05
+Error: 2.8162e-08
+Abw: 2.4991e-01
+Time to solution: 1.2004 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 8.00 / 9.40 / 11.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  9
+   Std and var for number of iterations: 0.92 -- 0.84
+Error: 2.8163e-08
+Abw: 2.4991e-01
+Time to solution: 0.9629 sec.
+
+Running with ml=False and num_procs=6...
+   Min/Mean/Max number of iterations: 9.00 / 10.20 / 12.00
+   Range of values for number of iterations:  3 
+   Position of max/min number of iterations:  0 --  7
+   Std and var for number of iterations: 0.98 -- 0.96
+Error: 2.8163e-08
+Abw: 2.4991e-01
+Time to solution: 0.6942 sec.
+
