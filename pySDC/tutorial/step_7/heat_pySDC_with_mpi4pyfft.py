@@ -150,8 +150,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(128, 128)]
-    problem_params['nu'] = 0.1
+    problem_params['nvars'] = [(64, 64)]
+    problem_params['nu'] = 0.01
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
