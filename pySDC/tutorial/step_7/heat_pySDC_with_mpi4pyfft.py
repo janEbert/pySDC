@@ -202,7 +202,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 10.0 #0.1
+    Tend = 1.0 #0.1
 
     f = None
     if rank == 0:
