@@ -146,7 +146,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     if ml:
         problem_params['nvars'] = [(128, 128), (32, 32)]
     else:
-        problem_params['nvars'] = [(32, 32)]
+        problem_params['nvars'] = [(8, 8)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -154,7 +154,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-
+    problem_params['RL_both'] = True 
 
     # initialize step parameters
     step_params = dict()
@@ -174,7 +174,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         if use_RL:
             sweeper_params['QI'] = ['RL'] 
             problem_params['use_RL'] = True 
-
+            #problem_params['RL_both'] = False 
+            
         else:
             sweeper_params['QI'] = ['MIN'] 
             problem_params['use_RL'] = False 
@@ -182,7 +183,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     else:
         sweeper_params['QI'] = ['LU']  
         problem_params['use_RL'] = False 
-
+        #problem_params['RL_both'] = True 
 
 
 
@@ -254,19 +255,19 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         f.write(out + '\n')
         print(out)
 
-        assert err <= 1.133E-05, 'Error is too high, got %s' % err
-        if ml:
-            if num_procs > 1:
-                maxmean = 12.5
-            else:
-                maxmean = 6.6
-        else:
-            maxmean = 12.7
+        #assert err <= 1.133E-05, 'Error is too high, got %s' % err
+        #if ml:
+        #    if num_procs > 1:
+        #        maxmean = 12.5
+        #    else:
+        #        maxmean = 6.6
+        #else:
+        #    maxmean = 12.7
         #assert np.mean(niters) <= maxmean, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
         print('Mean number of iterations %s' %( np.mean(niters)))
-        if np.mean(niters) > maxmean:
-            print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
+        #if np.mean(niters) > maxmean:
+        #    print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
 
         f.write('\n')
         print()
@@ -286,13 +287,13 @@ def main():
 
 
     #print("############ RL")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = True)
+    #run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = True)
     #print("############ MIN")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = False)
+    #run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = False)
     #print("############ LU")
-    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = imex_1st_order, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=1, sweeper_class = imex_1st_order, use_RL = False)
 
-
+    print("###")
 
 
 

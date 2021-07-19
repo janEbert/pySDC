@@ -114,6 +114,8 @@ class heat(ptype):
             if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
                 raise ProblemError('Need at least two dimensions')
 
+            self.nu = 0.1
+
             # Creating FFT structure
             ndim = len(problem_params['nvars'])
             axes = tuple(range(ndim))
@@ -149,7 +151,7 @@ class heat(ptype):
             K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
             K = np.array(K).astype(float)
             self.K2 = np.sum(K * K, 0, dtype=float)
-
+            self.K2 *= self.nu
 
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
@@ -168,25 +170,31 @@ class heat(ptype):
         self.iters = 0
         self.size = 0
 
-        print(self.time_rank , self.space_rank)
+        #print(self.time_rank , self.space_rank)
 
         if problem_params['use_RL']:
-            #self.QD = self.dtype_u(self.init)
+
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float) #complex)    #newDistArray(self.fft, True) 
             #for idx, x in np.ndenumerate(self.K2):
-            #    self.QD[idx] = self.model(self.model_params, -x*1j)[0][self.time_rank] #, rng=self.subkey
+                #self.QD[idx] = self.model(self.model_params, -x)[0][self.time_rank] #, rng=self.subkey
+
+                #if self.time_rank==0:
+                #    self.QD[idx] = 0.07334411
+                #elif self.time_rank==1:
+                #    self.QD[idx] = 0.23457661
+                #elif self.time_rank==2:
+                #    self.QD[idx] = 0.33921726
+
+
+                #print(self.time_rank, self.QD[idx])
+                
 
             tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
-            #tmp *= -1j
-            #tmp2 = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
-            #print(self.time_rank, self.model(self.model_params, tmp)[:,self.time_rank])
-            #print((tmp2.reshape(self.K2.shape[0], self.K2.shape[1])).shape, self.QD.shape)
-
-            #for idx, x in np.ndenumerate(self.K2):
-            #    #self.QD[idx] = tmp2[idx]
-            #    if abs(self.QD[idx] - tmp2[idx])>0.0001:
-            #        print(idx, self.QD[idx], tmp2[idx])
             self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+
+        #print(self.K2)
+        #print("interval", max(abs(self.K2.flatten())))
+
     #def createQI(self,k):
     #    if self.ist:
     #        self.QD2 = np.ndarray(shape=self.K2.shape) 
@@ -278,14 +286,14 @@ class heat(ptype):
 
 
         if self.params.spectral:
-            tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2)
+            tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)
             
             tmp_me[:] = self.fft.forward(tmp)
 
 
         else:
 
-            tmp_me[:] = np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2)
+            tmp_me[:] = np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2 * self.nu)
 
 
 
