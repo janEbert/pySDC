@@ -114,7 +114,7 @@ class heat(ptype):
             if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
                 raise ProblemError('Need at least two dimensions')
 
-            self.nu = 0.1
+            self.nu = problem_params['nu']
 
             # Creating FFT structure
             ndim = len(problem_params['nvars'])
