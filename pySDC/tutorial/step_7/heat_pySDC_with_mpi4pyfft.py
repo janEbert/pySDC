@@ -345,8 +345,6 @@ def main():
     MPI.COMM_WORLD.Barrier()
     run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit_MPI, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
-    print("############ MIN")
-    MPI.COMM_WORLD.Barrier()    
     print("############ LU")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=24, sweeper_class = generic_implicit, use_RL = False)
