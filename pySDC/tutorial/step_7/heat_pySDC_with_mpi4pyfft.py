@@ -1,3 +1,5 @@
+#mpirun -n 6 python heat_pySDC_with_mpi4pyfft.py -n 2
+
 from argparse import ArgumentParser
 import numpy as np
 from mpi4py import MPI
@@ -59,7 +61,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         eval_seed += 1
 
     rng_key = jax.random.PRNGKey(0)
-    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+    model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
 
     model_init, model = build_model(num_nodes)
     rng_key, subkey = jax.random.split(rng_key)
@@ -125,7 +127,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12#08
-    level_params['dt'] = 0.01 #0.01
+    level_params['dt'] = 1.0 #0.01 #0.01
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -146,7 +148,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #if ml:
     #    problem_params['nvars'] = [(128, 128), (32, 32)]
     #else:
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(32, 32)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -197,7 +199,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.1
+    Tend = 1.0 #0.1
 
     f = None
     if rank == 0:
@@ -255,7 +257,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         print("uinit, uend " , np.max(   (P.fft.backward(uinit)).real), np.max((P.fft.backward(uend)).real))
 
 
-    print(world_rank, err, P.iters, P.size)
+    #print(world_rank, err, P.iters, P.size)
 
     #print(world_rank, niter )
 
@@ -324,14 +326,19 @@ def main():
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     args = parser.parse_args()
 
-
-
+    MPI.COMM_WORLD.Barrier()    
     print("############ RL")
+    MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_implicit_MPI, use_RL = True)
+    MPI.COMM_WORLD.Barrier()    
     print("############ MIN")
+    MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_implicit_MPI, use_RL = False)
+    MPI.COMM_WORLD.Barrier()    
     print("############ LU")
+    MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit, use_RL = False)
+    MPI.COMM_WORLD.Barrier()    
 
 
 

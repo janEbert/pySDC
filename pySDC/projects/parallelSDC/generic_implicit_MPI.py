@@ -32,7 +32,8 @@ class generic_implicit_MPI(sweeper):
         else:
         #    self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
              self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
-        #print(self.QI)
+            
+             #print(self.QI)
 
 
 
