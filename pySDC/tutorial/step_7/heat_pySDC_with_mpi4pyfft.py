@@ -146,7 +146,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #if ml:
     #    problem_params['nvars'] = [(128, 128), (32, 32)]
     #else:
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(512, 512)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -320,16 +320,16 @@ def main():
 
     Note: This can also be run with "mpirun -np 2 python B_pySDC_with_mpi4pyfft.py"
     """
-    parser = ArgumentParser()
-    parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
-    args = parser.parse_args()
+    #parser = ArgumentParser()
+    #parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
+    #args = parser.parse_args()
 
 
 
     print("############ RL")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_implicit_MPI, use_RL = True)
+    run_simulation(spectral=True, ml=False, nprocs_space=2, sweeper_class = generic_implicit_MPI, use_RL = True)
     print("############ MIN")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_implicit_MPI, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=2, sweeper_class = generic_implicit_MPI, use_RL = False)
     print("############ LU")
     run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit, use_RL = False)
 
