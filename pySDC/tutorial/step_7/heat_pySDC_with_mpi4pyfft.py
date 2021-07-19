@@ -220,12 +220,14 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    MPI.COMM_WORLD.Barrier()    
+    run_time = MPI.Wtime()
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     MPI.COMM_WORLD.Barrier()    
     wt = MPI.Wtime() - wt
-
+    wt2 = MPI.Wtime() - run_time
 
     if False:
         plt.subplot(221)
@@ -309,7 +311,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
         print('Mean number of iterations %s' %( np.mean(niters)))
 
-        print("TIME", wt)
+        print("TIME", wt, wt2)
         f.write('\n')
         print()
         f.close()
