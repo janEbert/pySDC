@@ -189,11 +189,11 @@ class heat(ptype):
                 #print(self.time_rank, self.QD[idx])
                 
 
-            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*0.1).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
             self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
 
             #print("########## QD #######################", self.QD.shape)
-        #print("interval", max(abs(self.K2.flatten())))
+        #print("interval", max(abs(self.K2.flatten()*0.1)))
 
     #def createQI(self,k):
     #    if self.ist:

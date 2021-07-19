@@ -54,7 +54,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-    num_nodes = 4
+    num_nodes = 3
     seed = 0
     eval_seed = seed
     if eval_seed is not None:
@@ -127,7 +127,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12#08
-    level_params['dt'] = 1.0 #0.01 #0.01
+    level_params['dt'] = 0.1 #0.01 #0.01
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -138,7 +138,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     if sweeper_class == 'generic_implicit_MPI':
         assert sweeper_params['num_nodes'][0] == time_size, 'Need %s processors in time' % sweeper_params['num_nodes']   
 
-    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['initial_guess'] = 'spread' #zero'
 
 
     sweeper_params['comm'] = time_comm #MPI.COMM_WORLD
@@ -151,7 +151,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
 
     problem_params['nvars'] = [(64, 64)]
-    problem_params['nu'] = 0.01
+    problem_params['nu'] = 1.0
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -202,7 +202,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0 #0.1
+    Tend = 0.1
 
     f = None
     if rank == 0:
@@ -229,7 +229,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     if False:
         plt.subplot(221)
-        Z = P.fft.backward(uinit).reshape(128, 128)
+        Z = P.fft.backward(uinit).reshape(32, 32)
         plt.imshow(Z, interpolation='bilinear')
         plt.title('initial')
         plt.colorbar()
@@ -282,13 +282,13 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
               f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
         f.write(out + '\n')
         print(out)
-        out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-        f.write(out + '\n')
-        print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
-        f.write(out + '\n')
-        print(out)
+        #out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+        #f.write(out + '\n')
+        #print(out)
+        #out = '   Position of max/min number of iterations: %2i -- %2i' % \
+        #      (int(np.argmax(niters)), int(np.argmin(niters)))
+        #f.write(out + '\n')
+        #print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         print(out)
@@ -306,19 +306,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         f.write(out + '\n')
         print(out)
 
-        #assert err <= 1.133E-05, 'Error is too high, got %s' % err
-        if ml:
-            if num_procs > 1:
-                maxmean = 12.5
-            else:
-                maxmean = 6.6
-        else:
-            maxmean = 12.7
-        #assert np.mean(niters) <= maxmean, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
         print('Mean number of iterations %s' %( np.mean(niters)))
-        if np.mean(niters) > maxmean:
-            print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
 
         print("TIME", wt)
         f.write('\n')
@@ -337,15 +326,15 @@ def main():
     #args = parser.parse_args()
 
     MPI.COMM_WORLD.Barrier()    
-    print("############ RL")
+    #print("############ RL")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit_MPI, use_RL = True)
+    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
     MPI.COMM_WORLD.Barrier()
-    print("############ MIN")
+    #print("############ MIN")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit_MPI, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
-    print("############ LU")
+    #print("############ LU")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=24, sweeper_class = generic_implicit, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
