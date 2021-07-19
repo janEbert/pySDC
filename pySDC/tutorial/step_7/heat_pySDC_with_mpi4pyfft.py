@@ -54,7 +54,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-    num_nodes = 3
+    num_nodes = 4
     seed = 0
     eval_seed = seed
     if eval_seed is not None:
@@ -150,7 +150,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(512, 512)]
+    problem_params['nvars'] = [(128, 128)]
     problem_params['nu'] = 0.1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
@@ -339,17 +339,17 @@ def main():
     MPI.COMM_WORLD.Barrier()    
     print("############ RL")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=2, sweeper_class = generic_implicit_MPI, use_RL = True)
+    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit_MPI, use_RL = True)
     MPI.COMM_WORLD.Barrier()
     print("############ MIN")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=2, sweeper_class = generic_implicit_MPI, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit_MPI, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
     print("############ MIN")
     MPI.COMM_WORLD.Barrier()    
     print("############ LU")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = generic_implicit, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=24, sweeper_class = generic_implicit, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
 
 
