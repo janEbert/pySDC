@@ -127,7 +127,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = 0.01 
+    level_params['dt'] = 1. 
     #assert level_params['dt'] == 0.1, 'Zeitschritt muss in Problemklasse angepasst werden'
    
     level_params['nsweeps'] = [1]
@@ -152,7 +152,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(64, 64)]
     problem_params['nu'] = 0.1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
@@ -208,7 +208,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.5
+    Tend = 5.
 
     f = None
     if rank == 0:
