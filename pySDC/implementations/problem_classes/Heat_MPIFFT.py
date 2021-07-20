@@ -31,127 +31,64 @@ class heat(ptype):
             dtype_u: fft data type (will be passed to parent class)
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
-        if False:
-            if 'L' not in problem_params:
-                problem_params['L'] = 1.0 #2.0 * np.pi
-            # if 'init_type' not in problem_params:
-            #     problem_params['init_type'] = 'circle'
-            if 'comm' not in problem_params:
-                problem_params['comm'] = MPI.COMM_WORLD
-            if 'c' not in problem_params:
-                problem_params['c'] = 1.0
-
-            #if not problem_params['L'] == 2.0 * np.pi:
-            #    raise ProblemError(f'Setup not implemented, L has to be 2pi, got {problem_params["L"]}')
-
-            if not (problem_params['c'] == 0.0 or problem_params['c'] == 1.0):
-                raise ProblemError(f'Setup not implemented, c has to be 0 or 1, got {problem_params["c"]}')
-
-            # these parameters will be used later, so assert their existence
-            essential_keys = ['nvars', 'c', 'L', 'spectral']
-            for key in essential_keys:
-                if key not in problem_params:
-                    msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                    raise ParameterError(msg)
-
-            if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
-                raise ProblemError('Need at least two dimensions')
-
-            # Creating FFT structure
-            self.ndim = len(problem_params['nvars'])
-            axes = tuple(range(self.ndim))
-            self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, #complex128,
-                            collapse=True)
-
-            # get test data to figure out type and dimensions
-            tmp_u = newDistArray(self.fft, problem_params['spectral'])
-
-            # invoke super init, passing the communicator and the local dimensions as init
-            super(heat, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
-                                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
-
-            self.L = np.array([self.params.L] * self.ndim, dtype=np.float)#complex128)
-
-            # get local mesh
-            X = np.ogrid[self.fft.local_slice(False)]
-            N = self.fft.global_shape()
-            for i in range(len(N)):
-                X[i] = (X[i] * self.L[i] / N[i])
-            self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
-
-            # get local wavenumbers and Laplace operator
-            s = self.fft.local_slice()
-            N = self.fft.global_shape()
-            k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N]
-            K = [ki[si] for ki, si in zip(k, s)]
-            Ks = np.meshgrid(*K, indexing='ij', sparse=True)
-            Lp = 2 * np.pi / self.L
-            for i in range(self.ndim):
-                Ks[i] = (Ks[i] * Lp[i]).astype(np.complex128)
-            K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
-            K = np.array(K).astype(np.complex128)
-            self.K2 = np.sum(K * K, 0, dtype=np.complex128)
-            #print("K2", self.K2.shape)
 
 
 
+        if 'L' not in problem_params:
+            problem_params['L'] = 1.0
+        if 'comm' not in problem_params:
+            problem_params['comm'] = None
 
-        if True:
+        # these parameters will be used later, so assert their existence
+        essential_keys = ['nvars', 'spectral']
 
-            if 'L' not in problem_params:
-                problem_params['L'] = 1.0
-            if 'comm' not in problem_params:
-                problem_params['comm'] = None
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
 
-            # these parameters will be used later, so assert their existence
-            essential_keys = ['nvars', 'spectral']
+        if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
+            raise ProblemError('Need at least two dimensions')
 
-            for key in essential_keys:
-                if key not in problem_params:
-                    msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
-                    raise ParameterError(msg)
+        self.nu = problem_params['nu']
+        self.dt = problem_params['dt']
 
-            if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
-                raise ProblemError('Need at least two dimensions')
+        # Creating FFT structure
+        ndim = len(problem_params['nvars'])
+        axes = tuple(range(ndim))
+        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
-            self.nu = problem_params['nu']
+        # get test data to figure out type and dimensions
+        tmp_u = newDistArray(self.fft, problem_params['spectral'])
 
-            # Creating FFT structure
-            ndim = len(problem_params['nvars'])
-            axes = tuple(range(ndim))
-            self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
+        # invoke super init, passing the communicator and the local dimensions as init
+        super(heat, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
+                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
-            # get test data to figure out type and dimensions
-            tmp_u = newDistArray(self.fft, problem_params['spectral'])
+        L = np.array([self.params.L] * ndim, dtype=float)
 
-            # invoke super init, passing the communicator and the local dimensions as init
-            super(heat, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
-                                                 dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        # get local mesh
+        X = np.ogrid[self.fft.local_slice(False)]
+        N = self.fft.global_shape()
+        for i in range(len(N)):
+            X[i] = (X[i] * L[i] / N[i])
+        #print("X", X)
+        self.X = X #[np.broadcast_to(x, self.fft.shape(False)) for x in X]
 
-            L = np.array([self.params.L] * ndim, dtype=float)
-
-            # get local mesh
-            X = np.ogrid[self.fft.local_slice(False)]
-            N = self.fft.global_shape()
-            for i in range(len(N)):
-                X[i] = (X[i] * L[i] / N[i])
-            #print("X", X)
-            self.X = X #[np.broadcast_to(x, self.fft.shape(False)) for x in X]
-
-            # get local wavenumbers and Laplace operator
-            s = self.fft.local_slice()
-            N = self.fft.global_shape()
-            k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N[:-1]]
-            k.append(np.fft.rfftfreq(N[-1], 1. / N[-1]).astype(int))
-            K = [ki[si] for ki, si in zip(k, s)]
-            Ks = np.meshgrid(*K, indexing='ij', sparse=True)
-            Lp = 2 * np.pi / L
-            for i in range(ndim):
-                Ks[i] = (Ks[i] * Lp[i]).astype(float)
-            K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
-            K = np.array(K).astype(float)
-            self.K2 = np.sum(K * K, 0, dtype=float)
-            self.K2 *= self.nu
+        # get local wavenumbers and Laplace operator
+        s = self.fft.local_slice()
+        N = self.fft.global_shape()
+        k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N[:-1]]
+        k.append(np.fft.rfftfreq(N[-1], 1. / N[-1]).astype(int))
+        K = [ki[si] for ki, si in zip(k, s)]
+        Ks = np.meshgrid(*K, indexing='ij', sparse=True)
+        Lp = 2 * np.pi / L
+        for i in range(ndim):
+            Ks[i] = (Ks[i] * Lp[i]).astype(float)
+        K = [np.broadcast_to(k, self.fft.shape(True)) for k in Ks]
+        K = np.array(K).astype(float)
+        self.K2 = np.sum(K * K, 0, dtype=float)
+        self.K2 *= self.nu
 
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
@@ -174,35 +111,18 @@ class heat(ptype):
 
         if problem_params['use_RL']:
 
-            self.QD = np.ndarray(shape=self.K2.shape, dtype=float) #complex)    #newDistArray(self.fft, True) 
-            #for idx, x in np.ndenumerate(self.K2):
-                #self.QD[idx] = self.model(self.model_params, -x)[0][self.time_rank] #, rng=self.subkey
-
-                #if self.time_rank==0:
-                #    self.QD[idx] = 0.07334411
-                #elif self.time_rank==1:
-                #    self.QD[idx] = 0.23457661
-                #elif self.time_rank==2:
-                #    self.QD[idx] = 0.33921726
-
-
-                #print(self.time_rank, self.QD[idx])
+            self.QD = np.ndarray(shape=self.K2.shape, dtype=float) 
                 
+            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*self.dt*self.nu).flatten() ) 
+            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
 
-            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*0.1).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+            #for idx, x in np.ndenumerate(self.K2):
+            #    if self.K2[idx]*self.dt*self.nu < 2000:
+            #        self.QD[idx] = self.model(self.model_params, -x*self.dt*self.nu)[0][self.time_rank] #, rng=self.subkey
+            #    else:
+            #        self.QD[idx] = self.model(self.model_params, -2000)[0][self.time_rank]   
+            assert max(self.K2.flatten()*self.dt*self.nu) < 2000, 'zu gross %s' %max(self.K2.flatten()*0.01*self.nu)  
 
-            #print("########## QD #######################", self.QD.shape)
-        #print("interval", max(abs(self.K2.flatten()*0.1)))
-
-    #def createQI(self,k):
-    #    if self.ist:
-    #        self.QD2 = np.ndarray(shape=self.K2.shape) 
-    #        for idx, x in np.ndenumerate(self.K2):
-    #            self.QD2[idx] = k
-
-    #        print("max", self.QD2.shape, self.QD.shape, np.max(self.QD2-self.QD))
-    #    self.ist=False
 
     def multQI(self, x):
         f = self.dtype_u(self.init)

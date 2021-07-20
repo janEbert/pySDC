@@ -44,7 +44,7 @@ def load_model(path):
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
 
-def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None):
+def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None):
     """
     A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
 
@@ -126,8 +126,10 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12#08
-    level_params['dt'] = 0.1 #0.01 #0.01
+    level_params['restol'] = 1E-12
+    level_params['dt'] = 0.01 
+    #assert level_params['dt'] == 0.1, 'Zeitschritt muss in Problemklasse angepasst werden'
+   
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -150,8 +152,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(64, 64)]
-    problem_params['nu'] = 1.0
+    problem_params['nvars'] = [(128, 128)]
+    problem_params['nu'] = 0.1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -159,7 +161,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-
+    problem_params['dt'] = level_params['dt']
 
     # initialize step parameters
     step_params = dict()
@@ -181,8 +183,12 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
             problem_params['use_RL'] = True 
 
         else:
-            sweeper_params['QI'] = ['MIN'] 
-            problem_params['use_RL'] = False 
+            if MIN3:
+                sweeper_params['QI'] = ['MIN3'] 
+                problem_params['use_RL'] = False 
+            else:
+                sweeper_params['QI'] = ['MIN'] 
+                problem_params['use_RL'] = False 
 
     else:
         sweeper_params['QI'] = ['LU']  
@@ -202,7 +208,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.1
+    Tend = 0.5
 
     f = None
     if rank == 0:
@@ -291,9 +297,9 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         #      (int(np.argmax(niters)), int(np.argmin(niters)))
         #f.write(out + '\n')
         #print(out)
-        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-        f.write(out + '\n')
-        print(out)
+        #out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+        #f.write(out + '\n')
+        #print(out)
 
         out = f'Error: {err:6.4e}'
         f.write(out + '\n')
@@ -303,15 +309,15 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         f.write(abw2 + '\n')
         print(abw2)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-        out = f'Time to solution: {timing[0][1]:6.4f} sec.'
-        f.write(out + '\n')
-        print(out)
+        #timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        #out = f'Time to solution: {timing[0][1]:6.4f} sec.'
+        #f.write(out + '\n')
+        #print(out)
 
 
         print('Mean number of iterations %s' %( np.mean(niters)))
 
-        print("TIME", wt, wt2)
+        print("TIME", wt, wt2 )
         f.write('\n')
         print()
         f.close()
@@ -326,17 +332,23 @@ def main():
     #parser = ArgumentParser()
     #parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     #args = parser.parse_args()
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
 
     MPI.COMM_WORLD.Barrier()    
-    #print("############ RL")
+    if rank ==0: print("############ RL")
     MPI.COMM_WORLD.Barrier()
     run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
     MPI.COMM_WORLD.Barrier()
-    #print("############ MIN")
+    if rank ==0: print("############ MIN")
     MPI.COMM_WORLD.Barrier()
     run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
-    MPI.COMM_WORLD.Barrier()    
-    #print("############ LU")
+    MPI.COMM_WORLD.Barrier()
+    if rank ==0: print("############ MIN3")
+    MPI.COMM_WORLD.Barrier()   
+    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
+    MPI.COMM_WORLD.Barrier()  
+    if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=24, sweeper_class = generic_implicit, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
