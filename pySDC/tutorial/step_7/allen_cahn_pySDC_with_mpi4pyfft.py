@@ -1,5 +1,3 @@
-#mpirun -n 6 python heat_pySDC_with_mpi4pyfft.py -n 2
-
 from argparse import ArgumentParser
 import numpy as np
 from mpi4py import MPI
@@ -7,12 +5,14 @@ from mpi4py import MPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
-from pySDC.implementations.problem_classes.Heat_MPIFFT import heat
-#from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.projects.parallelSDC.generic_imex_MPI import generic_imex_MPI
+from pySDC.projects.parallelSDC.generic_imex_MPI import generic_imex_MPI
 
-import matplotlib.pyplot as plt
+#from pySDC.implementations.problem_classes.AdvectionDiffusion_MPIFFT import advectiondiffusion_imex
+from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex
+
+
 import jax
 import jax.numpy as jnp
 from jax.experimental import stax
@@ -53,7 +53,7 @@ def load_model(path):
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
 
-def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, index=None):
+def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, RL_both=None, index=None):
     """
     A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
 
@@ -70,7 +70,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         eval_seed += 1
 
     rng_key = jax.random.PRNGKey(0)
-    model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
+    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
 
     model_init, model = build_model(num_nodes)
     rng_key, subkey = jax.random.split(rng_key)
@@ -135,10 +135,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 0.1
-    #assert level_params['dt'] == 0.1, 'Zeitschritt muss in Problemklasse angepasst werden'
-   
+    level_params['restol'] = 1E-6
+    level_params['dt'] = 1.5*1E-03 #1e-3
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -146,23 +144,20 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [num_nodes]
 
-    if sweeper_class == 'generic_implicit_MPI':
+    if sweeper_class == 'generic_imex_MPI':
         assert sweeper_params['num_nodes'][0] == time_size, 'Need %s processors in time' % sweeper_params['num_nodes']   
 
-    sweeper_params['initial_guess'] = 'spread' #zero'
+    sweeper_params['initial_guess'] = 'spread'
 
 
     sweeper_params['comm'] = time_comm #MPI.COMM_WORLD
 
     # initialize problem parameters
     problem_params = dict()
-    #if ml:
-    #    problem_params['nvars'] = [(128, 128), (32, 32)]
-    #else:
-
-
-    problem_params['nvars'] = [(256, 256)]
-    problem_params['nu'] = 0.1
+    if ml:
+        problem_params['nvars'] = [(128, 128), (32, 32)]
+    else:
+        problem_params['nvars'] = [(128, 128)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -170,7 +165,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-    problem_params['dt'] = level_params['dt']
+    problem_params['RL_both'] = True             #####alt
+    problem_params['dt'] = level_params['dt']    #####neu
 
     # initialize step parameters
     step_params = dict()
@@ -184,25 +180,27 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_params'] = problem_params  # pass problem parameters
-    description['problem_class'] = heat
+    description['problem_class'] = allencahn_imex #advectiondiffusion_imex
     description['sweeper_class'] = sweeper_class #generic_imex_MPI # imex_1st_order
-    if sweeper_class == generic_implicit_MPI:
+    if sweeper_class == generic_imex_MPI:
         if use_RL:
             sweeper_params['QI'] = ['RL'] 
             problem_params['use_RL'] = True 
-
+            problem_params['RL_both'] = False 
+            if RL_both:
+                problem_params['RL_both'] = True 
+            
         else:
             if MIN3:
                 sweeper_params['QI'] = ['MIN3'] 
-                problem_params['use_RL'] = False 
-            else:
+                problem_params['use_RL'] = False
+            else: 
                 sweeper_params['QI'] = ['MIN'] 
-                problem_params['use_RL'] = False 
-
+                problem_params['use_RL'] = False
     else:
         sweeper_params['QI'] = ['LU']  
         problem_params['use_RL'] = False 
-
+        #problem_params['RL_both'] = True 
 
 
 
@@ -217,7 +215,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.5
+    Tend = 24*1e-3 #1.0
 
     #f = None
     #if rank == 0:
@@ -227,65 +225,35 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #    print(out)
 
     # instantiate controller
-
     MPI.COMM_WORLD.Barrier()    
     wt = MPI.Wtime()
+
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
+    # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     MPI.COMM_WORLD.Barrier()    
     run_time = MPI.Wtime()
     # call main function to get things done...
+
+
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    print("iters ", world_rank, P.iters )
 
     MPI.COMM_WORLD.Barrier()    
     wt = MPI.Wtime() - wt
     wt2 = MPI.Wtime() - run_time
 
-    if False:
-        plt.subplot(221)
-        Z = P.fft.backward(uinit).reshape(32, 32)
-        plt.imshow(Z, interpolation='bilinear')
-        plt.title('initial')
-        plt.colorbar()
-
-    if False:
-        plt.subplot(222)
-        Z2 = P.fft.backward(uend).reshape(128, 128)
-        plt.imshow(Z2, interpolation='bilinear')
-        plt.title('numeric')
-        plt.colorbar()
-
     uex = P.u_exact(Tend)
+    err = abs(uex - uend)
 
-    if False:
-        plt.subplot(223)
-        Z3 = P.fft.backward(uex).reshape(128, 128)
-        plt.imshow(Z3, interpolation='bilinear')
-        plt.title('exact')
-        plt.colorbar()
-        plt.show()
-
-    err =  np.linalg.norm(uex - uend, np.inf) #abs(uex - uend) #np.linalg.norm(uex - uend, np.inf)
-    abw = np.linalg.norm(uinit - uend, np.inf) #abs(uinit - uend) #np.linalg.norm(uinit - uend, np.inf)
+    print(world_rank, err, P.iters, P.size)
 
 
-    if False:
-        np.set_printoptions(precision=16)
 
-        print(np.max(P.fft.backward(uinit).real))
-
-        print("##### shape", uend.shape)
-        print("uex, uend ", np.max(   (P.fft.backward(uex)).real) , np.max((P.fft.backward(uend)).real))
-
-        print("uinit, uend " , np.max(   (P.fft.backward(uinit)).real), np.max((P.fft.backward(uend)).real))
-
-
-    #print(world_rank, err, P.iters, P.size)
-
-    print(world_rank, P.iters )
 
     if rank == 0:
         # filter statistics by type (number of iterations)
@@ -299,35 +267,38 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
               f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
         #f.write(out + '\n')
         print(out)
-        #out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         #f.write(out + '\n')
-        #print(out)
-        #out = '   Position of max/min number of iterations: %2i -- %2i' % \
-        #      (int(np.argmax(niters)), int(np.argmin(niters)))
-        #f.write(out + '\n')
-        #print(out)
-        #out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-        #f.write(out + '\n')
-        #print(out)
+        print(out)
 
         out = f'Error: {err:6.4e}'
         #f.write(out + '\n')
         print(out)
 
-        abw2 = f'Abw: {abw:6.4e}'
-        #f.write(abw2 + '\n')
-        print(abw2)
-
-        #timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-        #out = f'Time to solution: {timing[0][1]:6.4f} sec.'
+        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        out = f'Time to solution: {timing[0][1]:6.4f} sec.'
         #f.write(out + '\n')
-        #print(out)
+        print(out)
 
+        #assert err <= 1.133E-05, 'Error is too high, got %s' % err
+        #if ml:
+        #    if num_procs > 1:
+        #        maxmean = 12.5
+        #    else:
+        #        maxmean = 6.6
+        #else:
+        #    maxmean = 12.7
+        #assert np.mean(niters) <= maxmean, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
         print('Mean number of iterations %s' %( np.mean(niters)))
 
         print("TIME", wt, wt2 )
+        #if np.mean(niters) > maxmean:
+        #    print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
 
+        #f.write('\n')
+        #print()
+        #f.close()
         if index >=0:
             mins[index] = np.min(niters) 
             means[index] = np.mean(niters) 
@@ -377,10 +348,6 @@ def main():
 
     Note: This can also be run with "mpirun -np 2 python B_pySDC_with_mpi4pyfft.py"
     """
-    #parser = ArgumentParser()
-    #parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
-    #args = parser.parse_args()
-
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -391,38 +358,26 @@ def main():
 
 
 
-    #MPI.COMM_WORLD.Barrier()    
-    #if rank ==0: print("############ RL")
-    #MPI.COMM_WORLD.Barrier()
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
-    #MPI.COMM_WORLD.Barrier()
-    #if rank ==0: print("############ MIN")
-    #MPI.COMM_WORLD.Barrier()
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
-    #MPI.COMM_WORLD.Barrier()
-    #if rank ==0: print("############ MIN3")
-    #MPI.COMM_WORLD.Barrier()   
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
-    #MPI.COMM_WORLD.Barrier()  
-    
     MPI.COMM_WORLD.Barrier()    
     if rank ==0: print("############ RL")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = True, MIN3=False, index=0)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, index=0)
     MPI.COMM_WORLD.Barrier()
     if rank ==0: print("############ MIN")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=False, index=1)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=False, index=1)
     MPI.COMM_WORLD.Barrier()
     if rank ==0: print("############ MIN3")
     MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True, index=-1)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=True, index=-1)
     MPI.COMM_WORLD.Barrier()  
     if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, MIN3=False, index=2)
-    MPI.COMM_WORLD.Barrier()    
-    if rank == 0: plot()
+    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False, MIN3=False, index=2)
+    MPI.COMM_WORLD.Barrier()   
+    if rank==0: plot()
+
+    #run_simulation(spectral=True, ml=False, nprocs_space=1, sweeper_class = imex_1st_order, use_RL = False)
 
 
 

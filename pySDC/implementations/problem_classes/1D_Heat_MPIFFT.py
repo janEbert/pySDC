@@ -32,7 +32,7 @@ class heat(ptype):
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
-        print("IM INIT ###########################################################################################")
+
 
         if 'L' not in problem_params:
             problem_params['L'] = 1.0
@@ -125,8 +125,7 @@ class heat(ptype):
             #        self.QD[idx] = self.model(self.model_params, -x*self.dt*self.nu)[0][self.time_rank] #, rng=self.subkey
             #    else:
             #        self.QD[idx] = self.model(self.model_params, -2000)[0][self.time_rank]   
-            #print("MAX", max(self.K2.flatten()*self.dt*self.nu))
-            #print(self.time_rank, "min max", min(self.QD.flatten()), max(self.QD.flatten()))
+            print( max(self.K2.flatten()*self.dt*self.nu))
             #assert max(self.K2.flatten()*self.dt*self.nu) < 2000, 'zu gross %s' %max(self.K2.flatten()*0.01*self.nu)  
 
 

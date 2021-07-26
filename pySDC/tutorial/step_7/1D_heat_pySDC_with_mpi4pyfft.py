@@ -9,7 +9,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
-from pySDC.implementations.problem_classes.Heat_MPIFFT import heat
+from pySDC.implementations.problem_classes.1D_Heat_MPIFFT import heat
 #from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 import matplotlib.pyplot as plt
@@ -18,14 +18,8 @@ import jax.numpy as jnp
 from jax.experimental import stax
 from jax.experimental import optimizers
 
-import matplotlib.pyplot as plt
-import numpy as np
 
 num_nodes = 3
-
-mins = [9,10, 8]
-means = [11.6, 13.8, 11]
-maxima = [14, 17, 14]
 
 def build_model(M):
     scale = 1e-3
@@ -53,7 +47,7 @@ def load_model(path):
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
 
-def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, index=None):
+def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None):
     """
     A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
 
@@ -161,8 +155,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(256, 256)]
-    problem_params['nu'] = 0.1
+    problem_params['nvars'] = [(64, 64)]
+    problem_params['nu'] = 0.001
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -219,12 +213,12 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     t0 = 0.0
     Tend = 0.5
 
-    #f = None
-    #if rank == 0:
-    #    f = open('step_7_B_out.txt', 'a')
-    #    out = f'Running with ml={ml} and num_procs={world_size}...'
-    #    f.write(out + '\n')
-    #    print(out)
+    f = None
+    if rank == 0:
+        f = open('step_7_B_out.txt', 'a')
+        out = f'Running with ml={ml} and num_procs={world_size}...'
+        f.write(out + '\n')
+        print(out)
 
     # instantiate controller
 
@@ -297,7 +291,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         niters = np.array([item[1] for item in iter_counts])
         out = f'   Min/Mean/Max number of iterations: ' \
               f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
-        #f.write(out + '\n')
+        f.write(out + '\n')
         print(out)
         #out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         #f.write(out + '\n')
@@ -311,11 +305,11 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         #print(out)
 
         out = f'Error: {err:6.4e}'
-        #f.write(out + '\n')
+        f.write(out + '\n')
         print(out)
 
         abw2 = f'Abw: {abw:6.4e}'
-        #f.write(abw2 + '\n')
+        f.write(abw2 + '\n')
         print(abw2)
 
         #timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
@@ -327,49 +321,10 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         print('Mean number of iterations %s' %( np.mean(niters)))
 
         print("TIME", wt, wt2 )
+        f.write('\n')
+        print()
+        f.close()
 
-        if index >=0:
-            mins[index] = np.min(niters) 
-            means[index] = np.mean(niters) 
-            maxima[index] = np.max(niters)
-
-
-        #f.write('\n')
-        #print()
-        #f.close()
-
-def plot():
-    print("mins = ", mins)
-    print("means = ", means)
-    print("maxima = ", maxima)
-    labels = ['RL', 'Opt', 'LU']
-
-
-    x = np.arange(len(labels))  # the label locations
-    width = 0.6  # the width of the bars
-
-    fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width/2, mins, width/2, label='Min', color='green')
-    rects2 = ax.bar(x, means, width/2, label='Mean', color='orange')
-    rects3 = ax.bar(x + width/2, maxima, width/2, label='Max', color='red')
-
-    # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel('#iterations', fontsize=20)
-    ax.yaxis.set_tick_params(labelsize=12)
-    #ax.set_title('Scores by group and gender')
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=20)
-    ax.legend(fontsize=12)
-    #ax.tick_params(axis='both', which='minor', labelsize=20)
-
-
-    #ax.bar_label(rects1, padding=0, fontsize=12)
-    #ax.bar_label(rects2, padding=0, fontsize=12)
-    #ax.bar_label(rects3, padding=0, fontsize=12)
-
-    fig.tight_layout()
-
-    plt.show()
 
 def main():
     """
@@ -391,38 +346,24 @@ def main():
 
 
 
-    #MPI.COMM_WORLD.Barrier()    
-    #if rank ==0: print("############ RL")
-    #MPI.COMM_WORLD.Barrier()
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
-    #MPI.COMM_WORLD.Barrier()
-    #if rank ==0: print("############ MIN")
-    #MPI.COMM_WORLD.Barrier()
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
-    #MPI.COMM_WORLD.Barrier()
-    #if rank ==0: print("############ MIN3")
-    #MPI.COMM_WORLD.Barrier()   
-    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
-    #MPI.COMM_WORLD.Barrier()  
-    
     MPI.COMM_WORLD.Barrier()    
     if rank ==0: print("############ RL")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = True, MIN3=False, index=0)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = True)
     MPI.COMM_WORLD.Barrier()
     if rank ==0: print("############ MIN")
     MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=False, index=1)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False)
     MPI.COMM_WORLD.Barrier()
     if rank ==0: print("############ MIN3")
     MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True, index=-1)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
     MPI.COMM_WORLD.Barrier()  
     if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, MIN3=False, index=2)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
-    if rank == 0: plot()
+
 
 
 
