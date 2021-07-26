@@ -1,6 +1,6 @@
 #!/bin/bash -x
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=24
+#SBATCH --ntasks=4
 #SBATCH --output=run.out
 #SBATCH --error=run.err
 #SBATCH --time=00:00:30

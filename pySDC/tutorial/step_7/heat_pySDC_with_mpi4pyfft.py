@@ -152,7 +152,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(128, 128)]
+    problem_params['nvars'] = [(256, 256)]
     problem_params['nu'] = 0.1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
@@ -335,22 +335,22 @@ def main():
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
 
-    MPI.COMM_WORLD.Barrier()    
-    if rank ==0: print("############ RL")
-    MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
-    MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN")
-    MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
-    MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN3")
-    MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
-    MPI.COMM_WORLD.Barrier()  
+    #MPI.COMM_WORLD.Barrier()    
+    #if rank ==0: print("############ RL")
+    #MPI.COMM_WORLD.Barrier()
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
+    #MPI.COMM_WORLD.Barrier()
+    #if rank ==0: print("############ MIN")
+    #MPI.COMM_WORLD.Barrier()
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
+    #MPI.COMM_WORLD.Barrier()
+    #if rank ==0: print("############ MIN3")
+    #MPI.COMM_WORLD.Barrier()   
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
+    #MPI.COMM_WORLD.Barrier()  
     if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=24, sweeper_class = generic_implicit, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=4, sweeper_class = generic_implicit, use_RL = False)
     MPI.COMM_WORLD.Barrier()    
 
 
