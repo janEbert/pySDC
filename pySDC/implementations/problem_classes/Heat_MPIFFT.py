@@ -1,3 +1,4 @@
+import jax.numpy as jnp
 import numpy as np
 from mpi4py import MPI
 from mpi4py_fft import PFFT
@@ -97,7 +98,7 @@ class heat(ptype):
 
 
         self.model = problem_params['model']
-        self.model_params = problem_params['model_params'] 
+        self.model_params = list(problem_params['model_params'])
         self.rng_key = problem_params['rng_key'] 
         self.time_comm = problem_params['time_comm'] 
         self.time_rank = self.time_comm.Get_rank()
@@ -112,7 +113,7 @@ class heat(ptype):
 
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float) 
                 
-            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*self.dt*self.nu).flatten() ) 
+            tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
 
             #print("tmp ", tmp.shape  )
             self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
