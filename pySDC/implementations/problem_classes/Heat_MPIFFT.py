@@ -32,7 +32,7 @@ class heat(ptype):
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
-
+        print("IM INIT ###########################################################################################")
 
         if 'L' not in problem_params:
             problem_params['L'] = 1.0
@@ -114,19 +114,24 @@ class heat(ptype):
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float) 
                 
             tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*self.dt*self.nu).flatten() ) 
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
 
+            #print("tmp ", tmp.shape  )
+            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
+            #print(self.QD)
+
+            #print("vorhersage ",self.model(self.model_params, tmp).shape)
             #for idx, x in np.ndenumerate(self.K2):
             #    if self.K2[idx]*self.dt*self.nu < 2000:
             #        self.QD[idx] = self.model(self.model_params, -x*self.dt*self.nu)[0][self.time_rank] #, rng=self.subkey
             #    else:
             #        self.QD[idx] = self.model(self.model_params, -2000)[0][self.time_rank]   
-            assert max(self.K2.flatten()*self.dt*self.nu) < 2000, 'zu gross %s' %max(self.K2.flatten()*0.01*self.nu)  
+            #print("MAX", max(self.K2.flatten()*self.dt*self.nu))
+            #print(self.time_rank, "min max", min(self.QD.flatten()), max(self.QD.flatten()))
+            #assert max(self.K2.flatten()*self.dt*self.nu) < 2000, 'zu gross %s' %max(self.K2.flatten()*0.01*self.nu)  
 
 
     def multQI(self, x):
         f = self.dtype_u(self.init)
-
         f = x*self.QD 
         return f
 

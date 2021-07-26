@@ -32,6 +32,14 @@ class advectiondiffusion_imex(ptype):
         if 'c' not in problem_params:
             problem_params['c'] = 1.0
 
+        self.c = problem_params['c']
+        self.nu = 1.
+        self.imex= problem_params['imex']
+
+
+        if not self.imex:
+            dtype_f=mesh
+
         if not problem_params['L'] == 2.0 * np.pi:
             raise ProblemError(f'Setup not implemented, L has to be 2pi, got {problem_params["L"]}')
 
@@ -92,7 +100,7 @@ class advectiondiffusion_imex(ptype):
         self.dx = self.params.L / problem_params['nvars'][0]
         self.dy = self.params.L / problem_params['nvars'][1]
 
-
+        self.dt = problem_params['dt']
         self.model = problem_params['model']
         self.model_params = problem_params['model_params'] 
         self.subkey =  problem_params['subkey'] 
@@ -103,17 +111,21 @@ class advectiondiffusion_imex(ptype):
         self.space_rank = self.space_comm.Get_rank()
         self.iters = 0
         self.size = 0
+        self.use_both = problem_params['RL_both']
 
+        print("MAX k1", max(self.K1.flatten()*self.dt))
+        print("MAX k2", max(self.K2.flatten()*self.dt))
         if problem_params['use_RL']:
-            if problem_params['RL_both']:  
-                self.QD = np.ndarray(shape=self.K2.shape, dtype=complex)    #newDistArray(self.fft, True) 
-                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=complex, buffer= (-self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            if self.use_both:  
+                self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    #newDistArray(self.fft, True) 
+                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= ((-self.nu*self.K2+self.K1)*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
                 self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
             else:
-                self.QD = np.ndarray(shape=self.K2.shape, dtype=complex)    #newDistArray(self.fft, True) 
-                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=complex, buffer= (-self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+                self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    #newDistArray(self.fft, True) 
+                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
                 self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
 
+            #print(self.QD)
 
     def multQI(self, x):
         f = self.dtype_u(self.init)
@@ -140,8 +152,16 @@ class advectiondiffusion_imex(ptype):
         f = self.dtype_f(self.init)
 
         if self.params.spectral:
-            f.impl = -self.K2 * u
-            f.expl = self.K1 * u
+
+            if not self.imex:
+                f = -self.nu*self.K2 * u + self.K1 * u*1j
+            else:
+                if self.use_both:  
+                    f.impl = -self.nu*self.K2 * u + self.K1 * u*1j
+                    f.expl = u *0
+                else:
+                    f.impl = -self.nu*self.K2 * u
+                    f.expl = self.K1 * u*1j
 
         else:
 
@@ -174,8 +194,13 @@ class advectiondiffusion_imex(ptype):
         self.size = rhs.size
 
         if self.params.spectral:
-
-            me = rhs / (1.0 + factor * self.K2)
+            if not self.imex:
+                me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*1j))
+            else:
+                if self.use_both:  
+                    me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*1j))
+                else:
+                    me = rhs / (1.0 + factor * self.nu*self.K2)
 
         else:
 
@@ -202,15 +227,15 @@ class advectiondiffusion_imex(ptype):
 
 
         if self.params.spectral:
-            tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2)
+
+            tmp= np.sin(2*np.pi * (self.X[0] -self.c*t ) )* np.sin(2*np.pi * (self.X[1]-self.c *t)) #* np.exp(-t * 2 *(2* np.pi)**2)
             
             tmp_me[:] = self.fft.forward(tmp)
 
 
         else:
 
-            tmp_me[:] = np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2)
-
+            tmp_me[:] = np.sin(2*np.pi * (self.X[0]-self.c*t))*np.sin(2*np.pi * (self.X[1]-self.c*t)) #* np.exp(-t * 2 *(2* np.pi)**2)
 
 
         return tmp_me

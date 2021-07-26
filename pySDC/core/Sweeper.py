@@ -109,16 +109,24 @@ class sweeper(object):
             self.parallelizable = True
         elif qd_type == 'MIN':
             m = QDmat.shape[0] - 1
-            #x0 = 1 * np.ones(m)
-            x0 = 10 * np.ones(m)
-            d_ = [
-                0.3203856825077055,
-                0.1399680686269595,
-                0.3716708461097372,
-            ]
+            #x0 = 0.0 * np.ones(m)
+            x0 = 1 * np.ones(m)
+            #x0 = [
+            #    0.5,#203856825077055,
+            #    0.5,#399680686269595,
+            #    0.5,#716708461097372,
+            #]
+            #d = [0.624291954134957,   0.145021542538325,   0.238780092226807] #[0.321364704027614,   0.140397843459425,   0.372799997701224]
             d = opt.minimize(rho, x0, method='Nelder-Mead')
-            #print(d.x)
+            #print("optimierter Wert", d.x)
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
+
+            np.set_printoptions(precision=16)
+            #print(QDmat)
+
+            #x = [0.321364704027614,   0.140397843459425,   0.372799997701224]
+            #print(x)
+            #QDmat[1:, 1:] = np.diag(x)
             self.parallelizable = True
         elif qd_type == 'MIN3':
             m = QDmat.shape[0] - 1

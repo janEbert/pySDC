@@ -41,6 +41,11 @@ class allencahn_imex(ptype):
             problem_params['comm'] = None
         if 'dw' not in problem_params:
             problem_params['dw'] = 0.0
+        if 'eps' not in problem_params:
+            problem_params['eps'] = 0.04
+        if 'radius' not in problem_params:
+            problem_params['radius'] = 0.25
+
 
         # these parameters will be used later, so assert their existence
         essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw', 'spectral']
@@ -71,9 +76,9 @@ class allencahn_imex(ptype):
         N = self.fft.global_shape()
         for i in range(len(N)):
             X[i] = (X[i] * L[i] / N[i])
-        print("X", X)
+        #print("X", X)
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
-        print("self.X", self.X)
+        #print("self.X", self.X)
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
@@ -91,6 +96,36 @@ class allencahn_imex(ptype):
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
         self.dy = self.params.L / problem_params['nvars'][1]
+
+
+        # Need this for diagnostics
+        self.dx = self.params.L / problem_params['nvars'][0]
+        self.dy = self.params.L / problem_params['nvars'][1]
+
+        self.dt = problem_params['dt']
+        self.model = problem_params['model']
+        self.model_params = problem_params['model_params'] 
+        self.subkey =  problem_params['subkey'] 
+        self.rng_key = problem_params['rng_key'] 
+        self.time_comm = problem_params['time_comm'] 
+        self.time_rank = self.time_comm.Get_rank()
+        self.space_comm = problem_params['comm']
+        self.space_rank = self.space_comm.Get_rank()
+        self.iters = 0
+        self.size = 0
+
+        if problem_params['use_RL']:
+            self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    #newDistArray(self.fft, True) 
+            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+
+
+    def multQI(self, x):
+        f = self.dtype_u(self.init)
+
+        f = x*self.QD 
+        return f
+
 
     def eval_f(self, u, t):
         """
@@ -141,7 +176,7 @@ class allencahn_imex(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-
+        self.iters += 1
         if self.params.spectral:
 
             me = rhs / (1.0 + factor * self.K2)
@@ -166,7 +201,7 @@ class allencahn_imex(ptype):
             dtype_u: exact solution
         """
 
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
+        #assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2

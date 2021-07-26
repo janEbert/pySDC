@@ -189,6 +189,38 @@ class generic_implicit_MPI(sweeper):
 
         return None
 
+    def compute_residual2(self):
+        """
+        Computation of the residual using the collocation matrix Q
+        """
+
+        # get current level and problem description
+        L = self.level
+
+        # check if there are new values (e.g. from a sweep)
+        # assert L.status.updated
+
+        # compute the residual for each node
+
+        # build QF(u)
+        res = self.integrate()
+        res += L.u[0] - L.u[self.rank + 1]
+        # add tau if associated
+        if L.tau[self.rank] is not None:
+            res += L.tau[self.rank]
+        # use abs function from data type here
+        res_norm = abs(res)
+
+        #print("unterschiedliche residua ", res_norm)
+        # find maximal residual over the nodes
+        L.status.residual = res_norm
+
+        # indicate that the residual has seen the new values
+        L.status.updated = False
+
+        return None
+
+
     def predict(self):
         """
         Predictor to fill values at nodes before first sweep

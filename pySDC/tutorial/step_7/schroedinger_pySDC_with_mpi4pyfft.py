@@ -16,6 +16,15 @@ import jax.numpy as jnp
 from jax.experimental import stax
 from jax.experimental import optimizers
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+num_nodes = 3
+
+mins = [9,10, 8]
+means = [11.6, 13.8, 11]
+maxima = [14, 17, 14]
+
 def build_model(M):
     scale = 1e-3
     glorot_normal = jax.nn.initializers.variance_scaling(
@@ -42,7 +51,7 @@ def load_model(path):
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
 
-def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None):
+def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, index=None):
     """
     A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
 
@@ -52,7 +61,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-    num_nodes = 3
+
     seed = 0
     eval_seed = seed
     if eval_seed is not None:
@@ -271,7 +280,48 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         f.write('\n')
         print()
         f.close()
+        if index >=0:
+            mins[index] = np.min(niters) 
+            means[index] = np.mean(niters) 
+            maxima[index] = np.max(niters)
 
+
+        #f.write('\n')
+        #print()
+        #f.close()
+
+def plot():
+    print("mins = ", mins)
+    print("means = ", means)
+    print("maxima = ", maxima)
+    labels = ['RL', 'Opt', 'LU']
+
+
+    x = np.arange(len(labels))  # the label locations
+    width = 0.6  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/2, mins, width/2, label='Min', color='green')
+    rects2 = ax.bar(x, means, width/2, label='Mean', color='orange')
+    rects3 = ax.bar(x + width/2, maxima, width/2, label='Max', color='red')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('#iterations', fontsize=20)
+    ax.yaxis.set_tick_params(labelsize=12)
+    #ax.set_title('Scores by group and gender')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=20)
+    ax.legend(fontsize=12)
+    #ax.tick_params(axis='both', which='minor', labelsize=20)
+
+
+    #ax.bar_label(rects1, padding=0, fontsize=12)
+    #ax.bar_label(rects2, padding=0, fontsize=12)
+    #ax.bar_label(rects3, padding=0, fontsize=12)
+
+    fig.tight_layout()
+
+    plt.show()
 
 def main():
     """
@@ -279,19 +329,22 @@ def main():
 
     Note: This can also be run with "mpirun -np 2 python B_pySDC_with_mpi4pyfft.py"
     """
-    parser = ArgumentParser()
-    parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
-    args = parser.parse_args()
 
 
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    world_size = comm.Get_size()
+
+
+    n_space = int(world_size/num_nodes)
 
     #print("############ RL")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = True)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, index=0)
     #print("############ MIN")
-    run_simulation(spectral=True, ml=False, nprocs_space=args.nprocs_space, sweeper_class = generic_imex_MPI, use_RL = False)
+    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, index=1)
     #print("############ LU")
-    run_simulation(spectral=True, ml=False, nprocs_space=6, sweeper_class = imex_1st_order, use_RL = False)
-
+    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False, index=2)
+    if rank==0: plot()
 
 
 
