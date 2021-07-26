@@ -98,7 +98,6 @@ class heat(ptype):
 
         self.model = problem_params['model']
         self.model_params = problem_params['model_params'] 
-        self.subkey =  problem_params['subkey'] 
         self.rng_key = problem_params['rng_key'] 
         self.time_comm = problem_params['time_comm'] 
         self.time_rank = self.time_comm.Get_rank()

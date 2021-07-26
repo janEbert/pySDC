@@ -168,7 +168,6 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['time_comm'] = time_comm
     problem_params['model'] = model
     problem_params['model_params'] = params
-    problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
     problem_params['dt'] = level_params['dt']
 
