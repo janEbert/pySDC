@@ -32,7 +32,6 @@ class heat(ptype):
             dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
-        print("IM INIT ###########################################################################################")
 
         if 'L' not in problem_params:
             problem_params['L'] = 1.0

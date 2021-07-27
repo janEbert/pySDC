@@ -54,8 +54,12 @@ class advectiondiffusion1d_imex(ptype):
         for i in range(0, len(kx)):
             kx[i] = 2 * np.pi / self.params.L * i
 
+
         self.ddx = kx * 1j
         self.lap = -kx ** 2
+
+        print("self.ddx", self.ddx)
+        print("self.lap", self.lap)
 
     def eval_f(self, u, t):
         """

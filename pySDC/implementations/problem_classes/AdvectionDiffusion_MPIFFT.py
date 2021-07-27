@@ -155,11 +155,13 @@ class advectiondiffusion_imex(ptype):
         if problem_params['use_RL']:
             if self.use_both:  
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
-                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= ((-self.nu*self.K2+self.K1*1j)*self.dt).flatten() )
+                #tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= ((-self.nu*self.K2+self.K1*1j)*self.dt).flatten() )
+                tmp = jnp.array(((self.nu*self.K2+self.K1*1j)*self.dt).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
                 self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, self.rng_key)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
             else:
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
-                tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
+                #tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
+                tmp = jnp.array(((self.nu*self.K2)*self.dt).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
                 self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, self.rng_key)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
 
     def multQI(self, x):

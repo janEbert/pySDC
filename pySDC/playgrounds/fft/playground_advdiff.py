@@ -23,7 +23,7 @@ def main():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5, 3, 2]
+    sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
     sweeper_params['do_coll_update'] = False
@@ -33,7 +33,7 @@ def main():
     problem_params['nu'] = 0.02  # diffusion coefficient
     problem_params['c'] = 1.0   # advection speed
     problem_params['freq'] = -1  # frequency for the test value
-    problem_params['nvars'] = [256, 128, 64]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [4]  # number of degrees of freedom for each level
     problem_params['L'] = 1.0   # length of the interval [-L/2, L/2]
 
     # initialize step parameters
