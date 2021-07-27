@@ -96,7 +96,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #action = model(params, -1j, rng=subkey)
 
 
-    #model = jax.jit(model) 
+    model = jax.jit(model) 
 
 
     comm = MPI.COMM_WORLD
@@ -161,14 +161,13 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(31, 31)]
-    problem_params['nu'] = 1.
+    problem_params['nvars'] = [(256, 256)]
+    problem_params['nu'] = 0.1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
     problem_params['model'] = model
     problem_params['model_params'] = params
-    problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
     problem_params['dt'] = level_params['dt']
 
@@ -391,6 +390,20 @@ def main():
 
 
 
+    #MPI.COMM_WORLD.Barrier()    
+    #if rank ==0: print("############ RL")
+    #MPI.COMM_WORLD.Barrier()
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = True)
+    #MPI.COMM_WORLD.Barrier()
+    #if rank ==0: print("############ MIN")
+    #MPI.COMM_WORLD.Barrier()
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False)
+    #MPI.COMM_WORLD.Barrier()
+    #if rank ==0: print("############ MIN3")
+    #MPI.COMM_WORLD.Barrier()   
+    #run_simulation(spectral=True, ml=False, nprocs_space=8, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True)
+    #MPI.COMM_WORLD.Barrier()  
+    
     MPI.COMM_WORLD.Barrier()    
     if rank ==0: print("############ RL")
     MPI.COMM_WORLD.Barrier()
