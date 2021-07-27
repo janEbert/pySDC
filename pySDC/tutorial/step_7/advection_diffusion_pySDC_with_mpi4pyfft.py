@@ -27,23 +27,28 @@ mins = [9,10, 8, 0,0]
 means = [11.6, 13.8, 11, 0,0]
 maxima = [14, 17, 14, 0,0]
 
-def build_model(M):
+def build_model(M, train):
     scale = 1e-3
     glorot_normal = jax.nn.initializers.variance_scaling(
         scale, "fan_avg", "truncated_normal")
     normal = jax.nn.initializers.normal(scale)
+
+    dropout_rate = 0.0
+    mode = 'train' if train else 'test'
+    dropout_keep_rate = 1 - dropout_rate
+
     (model_init, model_apply) = stax.serial(
         stax.Dense(64, glorot_normal, normal),
+        stax.Dropout(dropout_keep_rate, mode),
         stax.Relu,
         # stax.Dense(256),
         # stax.Relu,
         stax.Dense(64, glorot_normal, normal),
+        stax.Dropout(dropout_keep_rate, mode),
         stax.Relu,
         stax.Dense(M, glorot_normal, normal),
     )
     return (model_init, model_apply)
-
-
 
 
 def load_model(path):
@@ -63,24 +68,34 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
+    if False:
+        seed = 0
+        eval_seed = seed
+        if eval_seed is not None:
+            eval_seed += 1
 
-    seed = 0
-    eval_seed = seed
-    if eval_seed is not None:
-        eval_seed += 1
+        rng_key = jax.random.PRNGKey(0)
+        model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
 
-    rng_key = jax.random.PRNGKey(0)
-    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
-
-    model_init, model = build_model(num_nodes)
-    rng_key, subkey = jax.random.split(rng_key)
-   
-    params, _ = load_model(model_path)
-
-    #rng_key = jax.random.PRNGKey(0)
-    #rng_key, subkey = jax.random.split(rng_key)
+        model_init, model = build_model(num_nodes)
+        rng_key, subkey = jax.random.split(rng_key)
+       
+        params, _ = load_model(model_path)
 
 
+    if True:
+
+        rng_key = jax.random.PRNGKey(0)
+        rng_key, subkey = jax.random.split(rng_key)
+        model_path = "models/dp_model_reell.npy" 
+        _, model = build_model(num_nodes, train=False)
+        params, _ = load_model(model_path)
+        
+
+    
+#    params = list(params)
+
+#    print("getestet",     model(params, 1, rng = subkey))
 
     #rng_key, subkey = jax.random.split(rng_key)
 
@@ -135,7 +150,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1E-14
     level_params['dt'] = 0.1 #1E-01 / 2
     level_params['nsweeps'] = [1]
 
@@ -245,8 +260,9 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
+    abw = abs(uend-uinit)
 
-    print(world_rank, err, P.iters, P.size)
+    print(world_rank, err, abw, P.iters, P.size)
 
     #print(world_rank, niter )
 
