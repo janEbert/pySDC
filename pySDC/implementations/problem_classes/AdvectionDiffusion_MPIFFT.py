@@ -8,41 +8,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 from mpi4py_fft import newDistArray
 
-import jax
-import jax.numpy as jnp
-from jax.experimental import stax
-from jax.experimental import optimizers
 
-def build_model(M, train):
-    scale = 1e-3
-    glorot_normal = jax.nn.initializers.variance_scaling(
-        scale, "fan_avg", "truncated_normal")
-    normal = jax.nn.initializers.normal(scale)
-
-    dropout_rate = 0.0
-    mode = 'train' if train else 'test'
-    dropout_keep_rate = 1 - dropout_rate
-
-    (model_init, model_apply) = stax.serial(
-        stax.Dense(64, glorot_normal, normal),
-        stax.Dropout(dropout_keep_rate, mode),
-        stax.Relu,
-        # stax.Dense(256),
-        # stax.Relu,
-        stax.Dense(64, glorot_normal, normal),
-        stax.Dropout(dropout_keep_rate, mode),
-        stax.Relu,
-        stax.Dense(M, glorot_normal, normal),
-    )
-    return (model_init, model_apply)
-
-
-def load_model(path):
-    with open(path, 'rb') as f:
-        weights = jnp.load(f, allow_pickle=True)
-    with open(str(path) + '.steps', 'rb') as f:
-        steps = jnp.load(f, allow_pickle=True)
-    return weights, steps
 
 class advectiondiffusion_imex(ptype):
     """
