@@ -1,10 +1,10 @@
 #!/bin/bash -x
 #SBATCH --nodes=1
-#SBATCH --ntasks=4
+#SBATCH --ntasks=3
 #SBATCH --output=run.out
 #SBATCH --error=run.err
 #SBATCH --time=00:00:30
 
 export PYTHONPATH=$PYTHONPATH:/p/home/jusers/schoebel1/jureca/RL/pySDC
-srun python heat_pySDC_with_mpi4pyfft.py 
+srun python advection_diffusion_pySDC_with_mpi4pyfft.py 
 touch ready

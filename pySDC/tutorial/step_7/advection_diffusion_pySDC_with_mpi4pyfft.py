@@ -378,7 +378,7 @@ def main():
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, MIN3=False, RL_both=False, index=4, imex=False)
     MPI.COMM_WORLD.Barrier()   
-    if rank ==0: plot()
+    #if rank ==0: plot()
     #run_simulation(spectral=True, ml=False, nprocs_space=1, sweeper_class = imex_1st_order, use_RL = False)
 
 
