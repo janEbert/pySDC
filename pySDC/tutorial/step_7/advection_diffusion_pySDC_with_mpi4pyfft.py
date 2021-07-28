@@ -429,7 +429,7 @@ def main():
 
     n_space = int(world_size/num_nodes)
 
-    print("aufteilung", world_size, n_space)
+    #print("aufteilung", world_size, n_space)
 
     MPI.COMM_WORLD.Barrier()    
     if rank ==0: print("############ RL+0")
