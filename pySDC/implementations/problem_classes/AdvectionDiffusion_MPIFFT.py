@@ -149,10 +149,10 @@ class advectiondiffusion_imex(ptype):
         self.use_both = problem_params['RL_both']
         self.num_nodes=3
 
-        print("MIN k1", min(self.K1.flatten()*self.dt))
-        print("MIN k2", min(self.K2.flatten()*self.dt*self.nu))
-        print("MAX k1", max(self.K1.flatten()*self.dt))
-        print("MAX k2", max(self.K2.flatten()*self.dt*self.nu))
+        #print("MIN k1", min(self.K1.flatten()*self.dt))
+        #print("MIN k2", min(self.K2.flatten()*self.dt*self.nu))
+        #print("MAX k1", max(self.K1.flatten()*self.dt))
+        #print("MAX k2", max(self.K2.flatten()*self.dt*self.nu))
 
         if problem_params['use_RL']:
             if self.use_both:  
