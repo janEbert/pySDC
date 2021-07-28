@@ -60,6 +60,8 @@ class advectiondiffusion_imex(ptype):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
 
 
+        print("im init", problem_params['nvars'])
+
         if 'L' not in problem_params:
             problem_params['L'] = 1.0
         if 'init_type' not in problem_params:
@@ -91,6 +93,7 @@ class advectiondiffusion_imex(ptype):
 
         # Creating FFT structure
         ndim = len(problem_params['nvars'])
+        self.dim = ndim
         axes = tuple(range(ndim))
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
@@ -150,19 +153,15 @@ class advectiondiffusion_imex(ptype):
         print("MAX k1", max(self.K1.flatten()*self.dt))
         print("MAX k2", max(self.K2.flatten()*self.dt))
 
-
-
         if problem_params['use_RL']:
             if self.use_both:  
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
-                #tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= ((-self.nu*self.K2+self.K1*1j)*self.dt).flatten() )
-                tmp = jnp.array(((self.nu*self.K2+self.K1*1j)*self.dt).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
-                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, self.rng_key)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
+                tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= ((-self.nu*self.K2-self.K1)*self.dt).flatten() )
+                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp)[:,self.time_rank].reshape(self.K2.shape)
             else:
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
-                #tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
-                tmp = jnp.array(((self.nu*self.K2)*self.dt).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
-                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, self.rng_key)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
+                tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
+                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp)[:,self.time_rank].reshape(self.K2.shape)
 
     def multQI(self, x):
         f = self.dtype_u(self.init)
@@ -222,8 +221,8 @@ class advectiondiffusion_imex(ptype):
 
 
         #if self.params.spectral:
-
-        tmp= np.sin(2*np.pi * (self.X[0] -self.c*t ) )* np.sin(2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)
+        f=1
+        tmp= np.sin(f*2*np.pi * (self.X[0] -self.c*t ) )* np.sin(f*2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * self.dim *(f*2* np.pi)**2* self.nu)* np.sin(f*2*np.pi * (self.X[2]-self.c *t))
         
         tmp_me[:] = self.fft.forward(tmp)
 
