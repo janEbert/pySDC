@@ -60,7 +60,6 @@ class advectiondiffusion_imex(ptype):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
 
 
-        print("im init", problem_params['nvars'])
 
         if 'L' not in problem_params:
             problem_params['L'] = 1.0
@@ -150,18 +149,23 @@ class advectiondiffusion_imex(ptype):
         self.use_both = problem_params['RL_both']
         self.num_nodes=3
 
+        print("MIN k1", min(self.K1.flatten()*self.dt))
+        print("MIN k2", min(self.K2.flatten()*self.dt*self.nu))
         print("MAX k1", max(self.K1.flatten()*self.dt))
-        print("MAX k2", max(self.K2.flatten()*self.dt))
+        print("MAX k2", max(self.K2.flatten()*self.dt*self.nu))
 
         if problem_params['use_RL']:
             if self.use_both:  
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
                 tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= ((-self.nu*self.K2-self.K1)*self.dt).flatten() )
-                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp)[:,self.time_rank].reshape(self.K2.shape)
+                #self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
+                self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
             else:
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
                 tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
-                self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp)[:,self.time_rank].reshape(self.K2.shape)
+                #self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
+                self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
+
 
     def multQI(self, x):
         f = self.dtype_u(self.init)
