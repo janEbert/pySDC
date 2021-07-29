@@ -183,7 +183,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     if ml:
         problem_params['nvars'] = [(128, 128), (32, 32)]
     else:
-        problem_params['nvars'] = [(32,32)]
+        problem_params['nvars'] = [(32,32,32)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
