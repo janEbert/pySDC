@@ -31,6 +31,7 @@ num_nodes = 3
 mins = [9,10, 8, 0,0]
 means = [11.6, 13.8, 11, 0,0]
 maxima = [14, 17, 14, 0,0]
+
 def _from_model_arch(model_arch, train):
     scale = 1e-7
     glorot_normal = jax.nn.initializers.variance_scaling(
@@ -88,8 +89,7 @@ def build_model(M, train):
 
 
 def build_opt(lr, params):
-    # lr = optimizers.polynomial_decay(lr, 15000, lr * 1e-7, 2.0)
-    # lr = optax.cosine_onecycle_schedule(15000, lr, 0.3, 1e7)
+
     lr = optax.cosine_onecycle_schedule(30000, 2 * lr, 0.3, 2e7)
 
     (opt_init, opt_update, opt_get_params) = optimizers.adam(lr)
@@ -118,49 +118,11 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     rng_key = jax.random.PRNGKey(0)
     rng_key, subkey = jax.random.split(rng_key)
-    model_path = "models/dp_model_2021-07-28T11-40-55.669033.npy" #"models/complex_model_2021-06-29T12-51-32.544928.npy"
+    model_path = "models/dp_model_2021-07-28T11-40-55.669033.npy" 
 
     params, model_arch, old_steps = load_model(model_path)
     _, model = _from_model_arch(model_arch, train=True)
-    #params = list(params)
 
-
-
-
-    if False:
-
-        seed = 0
-        eval_seed = seed
-        if eval_seed is not None:
-            eval_seed += 1
-
-        rng_key = jax.random.PRNGKey(0)
-        rng_key, subkey = jax.random.split(rng_key)
-    #    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
-        model_path = "models/dp_model_mixed7.npy"
-        model_init, model = build_model(num_nodes)
-
-       
-        params, _ = load_model(model_path)
-#    params = list(params)
-
-#    print("getestet",     model(params, 1, rng = subkey))
-
-    #rng_key, subkey = jax.random.split(rng_key)
-
-    #model_path = "complex_model_2021-06-29T12-51-32.544928.npy" #"dp_model_2021-06-24T09-55-45.128649.npy"
-
-    #params, _ = load_model(model_path)
-
-
-    #_, model = build_model(3, train=False)
-
-
-
-    #action = model(params, -1j, rng=subkey)
-
-
-    #model = jax.jit(model) 
 
 
     comm = MPI.COMM_WORLD
@@ -229,8 +191,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-    problem_params['RL_both'] = False           #####alt
-    problem_params['dt'] = level_params['dt']    #####neu
+    problem_params['RL_both'] = False           
+    problem_params['dt'] = level_params['dt']    
     problem_params['imex'] = imex
 
     # initialize step parameters
@@ -281,12 +243,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     t0 = 0.0
     Tend = 0.1
 
-    #f = None
-    #if rank == 0:
-    #    f = open('step_7_B_out.txt', 'a')
-    #    out = f'Running with ml={ml} and num_procs={world_size}...'
-    #    f.write(out + '\n')
-    #    print(out)
+
 
     # instantiate controller
     MPI.COMM_WORLD.Barrier()    
@@ -313,20 +270,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     abw = abs(uend-uinit)
 
 
-    #problem_params['nvars'] = [(128,128,128)]
-    #description['space_transfer_class'] = fft_to_fft
-    #controller2 = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-    #P2 = controller2.MS[0].levels[0].prob
 
-    #space_transfer_params = dict()
-    #space_transfer_params['rorder'] = 2
-    #space_transfer_params['iorder'] = 4
-    #F = fft_to_fft(P2,P, space_transfer_params)
-    #print("prolong", abs(F.prolong(G=uend)-P2.u_exact(Tend)   ))
-
-    print(world_rank, err, abw, P.iters, P.size)
-
-    #print(world_rank, niter )
 
     if rank == 0:
         # filter statistics by type (number of iterations)
@@ -353,25 +297,10 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         #f.write(out + '\n')
         print(out)
 
-        #assert err <= 1.133E-05, 'Error is too high, got %s' % err
-        #if ml:
-        #    if num_procs > 1:
-        #        maxmean = 12.5
-        #    else:
-        #        maxmean = 6.6
-        #else:
-        #    maxmean = 12.7
-        #assert np.mean(niters) <= maxmean, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-
         print('Mean number of iterations %s' %( np.mean(niters)))
 
         print("TIME", wt, wt2 )
-        #if np.mean(niters) > maxmean:
-        #    print('Mean number of iterations is too high, got %s expected %s' %( np.mean(niters), maxmean))
 
-        #f.write('\n')
-        #print()
-        #f.close()
         if index >=0:
             mins[index] = np.min(niters) 
             means[index] = np.mean(niters) 
@@ -429,25 +358,27 @@ def main():
 
     n_space = int(world_size/num_nodes)
 
-    #print("aufteilung", world_size, n_space)
 
-    MPI.COMM_WORLD.Barrier()    
-    if rank ==0: print("############ RL+0")
-    MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=False, index=0, imex=True)
-    MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ RL+RL")
-    MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=True, index=1, imex=True)
-    MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN")
-    MPI.COMM_WORLD.Barrier()
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=False, RL_both=False, index=2, imex=True)
-    MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN3")
-    MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=True, RL_both=False, index=-1, imex=True)
-    MPI.COMM_WORLD.Barrier()  
+    if False:
+
+        MPI.COMM_WORLD.Barrier()    
+        if rank ==0: print("############ RL+0")
+        MPI.COMM_WORLD.Barrier()
+        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=False, index=0, imex=True)
+        MPI.COMM_WORLD.Barrier()
+        if rank ==0: print("############ RL+RL")
+        MPI.COMM_WORLD.Barrier()
+        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=True, index=1, imex=True)
+        MPI.COMM_WORLD.Barrier()
+        if rank ==0: print("############ MIN")
+        MPI.COMM_WORLD.Barrier()
+        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=False, RL_both=False, index=2, imex=True)
+        MPI.COMM_WORLD.Barrier()
+        if rank ==0: print("############ MIN3")
+        MPI.COMM_WORLD.Barrier()   
+        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=True, RL_both=False, index=-1, imex=True)
+        MPI.COMM_WORLD.Barrier()  
+
     if rank ==0: print("############ LU+0")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False, MIN3=False, RL_both=False, index=3, imex=True)
