@@ -192,8 +192,11 @@ class advectiondiffusion_imex(ptype):
 
         #if self.params.spectral:
         f=1
-        tmp= np.sin(f*2*np.pi * (self.X[0] -self.c*t ) )* np.sin(f*2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * self.dim *(f*2* np.pi)**2* self.nu)* np.sin(f*2*np.pi * (self.X[2]-self.c *t))
-        
+
+        if self.dim ==2:
+            tmp= np.sin(f*2*np.pi * (self.X[0] -self.c*t ) )* np.sin(f*2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * self.dim *(f*2* np.pi)**2* self.nu)
+        else:
+            tmp= np.sin(f*2*np.pi * (self.X[0] -self.c*t ) )* np.sin(f*2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * self.dim *(f*2* np.pi)**2* self.nu)* np.sin(f*2*np.pi * (self.X[2]-self.c *t))
         tmp_me[:] = self.fft.forward(tmp)
 
 
