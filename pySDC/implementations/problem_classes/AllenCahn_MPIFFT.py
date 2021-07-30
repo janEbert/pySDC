@@ -42,7 +42,7 @@ class allencahn_imex(ptype):
         if 'dw' not in problem_params:
             problem_params['dw'] = 0.0
         if 'eps' not in problem_params:
-            problem_params['eps'] = 0.04
+            problem_params['eps'] = 0.04#0.04
         if 'radius' not in problem_params:
             problem_params['radius'] = 0.25
 
@@ -58,6 +58,7 @@ class allencahn_imex(ptype):
             raise ProblemError('Need at least two dimensions')
 
         # Creating FFT structure
+        self.ndim = len(problem_params['nvars'])
         ndim = len(problem_params['nvars'])
         axes = tuple(range(ndim))
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
@@ -116,9 +117,11 @@ class allencahn_imex(ptype):
 
         if problem_params['use_RL']:
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    #newDistArray(self.fft, True) 
-            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=float, buffer= (-self.K2*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+            tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.K2*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            #self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
+            self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
 
+            #print("MAX", max(self.K2.flatten()*self.dt))
 
     def multQI(self, x):
         f = self.dtype_u(self.init)
@@ -204,12 +207,21 @@ class allencahn_imex(ptype):
         #assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
+
+
+            if self.ndim==2:
+                r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2 
+            else:
+                r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2 + (self.X[2] - 0.5) ** 2
             if self.params.spectral:
                 tmp = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
                 me[:] = self.fft.forward(tmp)
             else:
                 me[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+
+
+
+
         elif self.params.init_type == 'circle_rand':
             ndim = len(me.shape)
             L = int(self.params.L)

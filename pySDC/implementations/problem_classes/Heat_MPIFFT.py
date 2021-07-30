@@ -55,6 +55,7 @@ class heat(ptype):
 
         # Creating FFT structure
         ndim = len(problem_params['nvars'])
+        self.ndim = len(problem_params['nvars'])
         axes = tuple(range(ndim))
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
@@ -112,10 +113,10 @@ class heat(ptype):
 
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float) 
                 
-            tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1],1) 
+            tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) #.reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) 
 
             #print("tmp ", tmp.shape  )
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
+            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    #.reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    
             #print(self.QD)
 
             #print("vorhersage ",self.model(self.model_params, tmp).shape)
@@ -210,14 +211,17 @@ class heat(ptype):
 
 
         if self.params.spectral:
-            tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)
-            
+            if self.ndim==2:
+
+                tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)
+            else:
+                tmp= np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)*np.sin(2*np.pi * self.X[2])
             tmp_me[:] = self.fft.forward(tmp)
 
 
         else:
 
-            tmp_me[:] = np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1]) * np.exp(-t * 2 *(2* np.pi)**2 * self.nu)
+            tmp_me[:] = np.sin(2*np.pi * self.X[0])*np.sin(2*np.pi * self.X[1])*np.sin(2*np.pi * self.X[2]) * np.exp(-t * 2 *(2* np.pi)**2 * self.nu)
 
 
 

@@ -69,6 +69,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     rng_key = jax.random.PRNGKey(0)
     model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+    #model_path = "models/dp_model_complex.npy"
 
     model_init, model = build_model(num_nodes)
     rng_key, subkey = jax.random.split(rng_key)
@@ -163,7 +164,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-
+    problem_params['dt'] = level_params['dt']
 
     # initialize step parameters
     step_params = dict()

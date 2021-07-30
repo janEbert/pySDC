@@ -90,7 +90,7 @@ class nonlinearschroedinger_imex(ptype):
         self.dx = self.params.L / problem_params['nvars'][0]
         self.dy = self.params.L / problem_params['nvars'][1]
 
-
+        self.dt = problem_params['dt']
         self.model = problem_params['model']
         self.model_params = problem_params['model_params'] 
         self.subkey =  problem_params['subkey'] 
@@ -108,7 +108,7 @@ class nonlinearschroedinger_imex(ptype):
             #for idx, x in np.ndenumerate(self.K2):
             #    self.QD[idx] = self.model(self.model_params, -x*1j)[0][self.time_rank] #, rng=self.subkey
 
-            tmp = np.ndarray(shape=(self.K2.shape[0]*self.K2.shape[1],1),dtype=complex, buffer= (-1j*self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=complex, buffer= (-1j*self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
             #tmp *= -1j
             #tmp2 = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
             #print(self.time_rank, self.model(self.model_params, tmp)[:,self.time_rank])
@@ -118,7 +118,9 @@ class nonlinearschroedinger_imex(ptype):
             #    #self.QD[idx] = tmp2[idx]
             #    if abs(self.QD[idx] - tmp2[idx])>0.0001:
             #        print(idx, self.QD[idx], tmp2[idx])
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+            #self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    #tmp2#.reshape(self.K2.shape[0], self.K2.shape[1])[:]
+            self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
+            #print("MAX", max(self.K2.flatten()*self.dt))
     #def createQI(self,k):
     #    if self.ist:
     #        self.QD2 = np.ndarray(shape=self.K2.shape) 

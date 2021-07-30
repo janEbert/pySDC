@@ -132,6 +132,7 @@ class advectiondiffusion_imex(ptype):
                 #self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
                 self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
 
+            #print("MAX", max(self.K2.flatten()*self.dt*self.nu))
 
     def multQI(self, x):
         f = self.dtype_u(self.init)

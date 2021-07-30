@@ -27,7 +27,7 @@ mins = [9,10, 8]
 means = [11.6, 13.8, 11]
 maxima = [14, 17, 14]
 
-def build_model(M):
+def _build_model(M):
     scale = 1e-3
     glorot_normal = jax.nn.initializers.variance_scaling(
         scale, "fan_avg", "truncated_normal")
@@ -46,12 +46,86 @@ def build_model(M):
 
 
 
-def load_model(path):
+def _load_model(path):
     with open(path, 'rb') as f:
         weights = jnp.load(f, allow_pickle=True)
     with open(str(path) + '.steps', 'rb') as f:
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
+
+def _from_model_arch(model_arch, train):
+    scale = 1e-7
+    glorot_normal = jax.nn.initializers.variance_scaling(
+        scale, "fan_avg", "truncated_normal")
+    normal = jax.nn.initializers.normal(scale)
+
+    dropout_rate = 0.0
+    mode = 'train' if train else 'test'
+    dropout_keep_rate = 1 - dropout_rate
+
+    model_arch_real = []
+    for tup in model_arch:
+        if not isinstance(tup, tuple):
+            tup = (tup,)
+        name = tup[0]
+        if len(tup) > 1:
+            args = tup[1]
+        if len(tup) > 2:
+            kwargs = tup[2]
+
+        layer = getattr(stax, name)
+        if name == 'Dense':
+            args = args + (glorot_normal, normal)
+        elif name == 'Dropout':
+            args = args + (dropout_keep_rate, mode)
+
+        if len(tup) == 1:
+            model_arch_real.append(layer)
+        elif len(tup) == 2:
+            model_arch_real.append(layer(*args))
+        elif len(tup) == 3:
+            model_arch_real.append(layer(*args, **kwargs))
+        else:
+            raise ValueError('error in model_arch syntax')
+    (model_init, model_apply) = stax.serial(*model_arch_real)
+    return (model_init, model_apply)
+
+
+def build_model(M, train):
+    model_arch = [
+        ('Dense', (128,)),
+        ('Dropout', ()),
+        ('Relu',),
+        ('Dense', (256,)),
+        ('Relu',),
+        ('Dense', (128,)),
+        ('Dropout', ()),
+        ('Relu',),
+        ('Dense', (M,)),
+    ]
+
+    (model_init, model_apply) = _from_model_arch(model_arch, train=train)
+
+    return (model_init, model_apply, model_arch)
+
+
+def build_opt(lr, params):
+
+    lr = optax.cosine_onecycle_schedule(30000, 2 * lr, 0.3, 2e7)
+
+    (opt_init, opt_update, opt_get_params) = optimizers.adam(lr)
+    opt_state = opt_init(params)
+    return (opt_state, opt_update, opt_get_params)
+
+
+def load_model(path):
+    with open(path, 'rb') as f:
+        weights = jnp.load(f, allow_pickle=True)
+    with open(str(path) + '.structure', 'rb') as f:
+        model_arch = jnp.load(f, allow_pickle=True)
+    with open(str(path) + '.steps', 'rb') as f:
+        steps = jnp.load(f, allow_pickle=True)
+    return weights, model_arch, steps
 
 def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, RL_both=None, index=None):
     """
@@ -63,19 +137,28 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-
-    seed = 0
-    eval_seed = seed
-    if eval_seed is not None:
-        eval_seed += 1
-
     rng_key = jax.random.PRNGKey(0)
-    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
-
-    model_init, model = build_model(num_nodes)
     rng_key, subkey = jax.random.split(rng_key)
-   
-    params, _ = load_model(model_path)
+    model_path = "models/dp_model_reell.npy"
+
+    params, model_arch, old_steps = load_model(model_path)
+    _, model = _from_model_arch(model_arch, train=True)
+
+
+    if False:
+        seed = 0
+        eval_seed = seed
+        if eval_seed is not None:
+            eval_seed += 1
+
+        rng_key = jax.random.PRNGKey(0)
+        model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+
+
+        model_init, model = build_model(num_nodes)
+        rng_key, subkey = jax.random.split(rng_key)
+       
+        params, _ = load_model(model_path)
 
     #rng_key = jax.random.PRNGKey(0)
     #rng_key, subkey = jax.random.split(rng_key)
@@ -157,7 +240,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     if ml:
         problem_params['nvars'] = [(128, 128), (32, 32)]
     else:
-        problem_params['nvars'] = [(128, 128)]
+        problem_params['nvars'] = [(32, 32)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -215,7 +298,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 24*1e-3 #1.0
+    Tend = 36*1e-3 #1.0
 
     #f = None
     #if rank == 0:
@@ -367,10 +450,10 @@ def main():
     MPI.COMM_WORLD.Barrier()
     run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=False, index=1)
     MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN3")
-    MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=True, index=-1)
-    MPI.COMM_WORLD.Barrier()  
+    #if rank ==0: print("############ MIN3")
+    #MPI.COMM_WORLD.Barrier()   
+    #run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=True, index=-1)
+    #MPI.COMM_WORLD.Barrier()  
     if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False, MIN3=False, index=2)

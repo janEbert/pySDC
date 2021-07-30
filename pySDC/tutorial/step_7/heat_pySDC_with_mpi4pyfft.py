@@ -161,8 +161,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #else:
 
 
-    problem_params['nvars'] = [(256, 256)]
-    problem_params['nu'] = 0.1
+    problem_params['nvars'] = [(32,32,32)]
+    problem_params['nu'] = 1
     problem_params['spectral'] = spectral
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
@@ -236,7 +236,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     MPI.COMM_WORLD.Barrier()    
     run_time = MPI.Wtime()
-    # call main function to get things done...
+
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     MPI.COMM_WORLD.Barrier()    
@@ -267,8 +267,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         plt.colorbar()
         plt.show()
 
-    err =  np.linalg.norm(uex - uend, np.inf) #abs(uex - uend) #np.linalg.norm(uex - uend, np.inf)
-    abw = np.linalg.norm(uinit - uend, np.inf) #abs(uinit - uend) #np.linalg.norm(uinit - uend, np.inf)
+    err =  np.linalg.norm(uex.flatten() - uend.flatten(), np.inf) 
+    abw = np.linalg.norm(uinit.flatten() - uend.flatten(), np.inf) 
 
 
     if False:
@@ -413,15 +413,15 @@ def main():
     MPI.COMM_WORLD.Barrier()
     run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=False, index=1)
     MPI.COMM_WORLD.Barrier()
-    if rank ==0: print("############ MIN3")
-    MPI.COMM_WORLD.Barrier()   
-    run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True, index=-1)
-    MPI.COMM_WORLD.Barrier()  
+    #if rank ==0: print("############ MIN3")
+    #MPI.COMM_WORLD.Barrier()   
+    #run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=True, index=-1)
+    #MPI.COMM_WORLD.Barrier()  
     if rank ==0: print("############ LU")
     MPI.COMM_WORLD.Barrier()    
     run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, MIN3=False, index=2)
     MPI.COMM_WORLD.Barrier()    
-    #if rank == 0: plot()
+    if rank == 0: plot()
 
 
 
