@@ -113,8 +113,8 @@ class heat(ptype):
 
             self.QD = np.ndarray(shape=self.K2.shape, dtype=float) 
                 
-            tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) #.reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) 
-
+            #tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) #.reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) 
+            tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
             #print("tmp ", tmp.shape  )
             self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    #.reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    
             #print(self.QD)
