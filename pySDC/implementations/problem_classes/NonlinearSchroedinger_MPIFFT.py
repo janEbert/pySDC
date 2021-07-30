@@ -108,7 +108,7 @@ class nonlinearschroedinger_imex(ptype):
             #for idx, x in np.ndenumerate(self.K2):
             #    self.QD[idx] = self.model(self.model_params, -x*1j)[0][self.time_rank] #, rng=self.subkey
 
-            tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=complex, buffer= (-1j*self.K2).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
+            tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=complex, buffer= (-1j*self.K2*self.dt).flatten() )#np.array(self.K2.flatten(), dtype=complex)) #self.K2.flatten())
             #tmp *= -1j
             #tmp2 = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])
             #print(self.time_rank, self.model(self.model_params, tmp)[:,self.time_rank])

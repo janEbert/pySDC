@@ -42,7 +42,7 @@ class allencahn_imex(ptype):
         if 'dw' not in problem_params:
             problem_params['dw'] = 0.0
         if 'eps' not in problem_params:
-            problem_params['eps'] = 0.04#0.04
+            problem_params['eps'] = 10 #0.04#0.04
         if 'radius' not in problem_params:
             problem_params['radius'] = 0.25
 

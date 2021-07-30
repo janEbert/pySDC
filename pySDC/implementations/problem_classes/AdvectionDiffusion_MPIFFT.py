@@ -40,9 +40,9 @@ class advectiondiffusion_imex(ptype):
 
         self.c = problem_params['c']
         self.nu = 1
+
+        #imex needs imex mesh full implicit run just normal mesh
         self.imex= problem_params['imex']
-
-
         if not self.imex:
             dtype_f=mesh
 
@@ -78,7 +78,7 @@ class advectiondiffusion_imex(ptype):
             X[i] = (X[i] * L[i] / N[i])
         #print("X", X)
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
-        #print("self.X", self.X)
+
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
@@ -96,7 +96,7 @@ class advectiondiffusion_imex(ptype):
 
         self.K1 = np.sum(K , 0, dtype=float)
         
-        #print("K", self.K1)
+
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
         self.dy = self.params.L / problem_params['nvars'][1]
@@ -112,24 +112,18 @@ class advectiondiffusion_imex(ptype):
         self.space_rank = self.space_comm.Get_rank()
         self.iters = 0
         self.size = 0
-        self.use_both = problem_params['RL_both']
         self.num_nodes=3
 
-        #print("MIN k1", min(self.K1.flatten()*self.dt))
-        #print("MIN k2", min(self.K2.flatten()*self.dt*self.nu))
-        #print("MAX k1", max(self.K1.flatten()*self.dt))
-        #print("MAX k2", max(self.K2.flatten()*self.dt*self.nu))
 
+        #if implicit optimize Q_\Delta just for (-\dt \Laplace)  
         if problem_params['use_RL']:
-            if self.use_both:  
+            if not self.imex:  
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
                 tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= ((-self.nu*self.K2-self.K1)*self.dt).flatten() )
-                #self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
                 self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
             else:
                 self.QD = np.ndarray(shape=self.K2.shape, dtype=float)    
                 tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
-                #self.QD[:,:] = jax.jit(jax.vmap(self.model, in_axes=(None, 0)))(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
                 self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
 
             #print("MAX", max(self.K2.flatten()*self.dt*self.nu))
@@ -148,12 +142,9 @@ class advectiondiffusion_imex(ptype):
         if not self.imex:
             f = -self.nu*self.K2 * u + self.K1 * u*(-1j)
         else:
-            if self.use_both:  
-                f.impl = -self.nu*self.K2 * u + self.K1 * u*(-1j)
-                f.expl = u *0
-            else:
-                f.impl = -self.nu*self.K2 * u
-                f.expl = self.K1 * u*(-1j)
+
+            f.impl = -self.nu*self.K2 * u
+            f.expl = self.K1 * u*(-1j)
 
 
         return f
@@ -169,10 +160,7 @@ class advectiondiffusion_imex(ptype):
         if not self.imex:
             me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*(-1j))) #1j
         else:
-            if self.use_both:  
-                me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*(-1j))) #1j
-            else:
-                me = rhs / (1.0 + factor * self.nu*self.K2)
+            me = rhs / (1.0 + factor * self.nu*self.K2)
 
         return me
 
@@ -191,7 +179,6 @@ class advectiondiffusion_imex(ptype):
         u = self.dtype_u(self.init, val=1.0) 
 
 
-        #if self.params.spectral:
         f=1
 
         if self.dim ==2:
@@ -200,10 +187,6 @@ class advectiondiffusion_imex(ptype):
             tmp= np.sin(f*2*np.pi * (self.X[0] -self.c*t ) )* np.sin(f*2*np.pi * (self.X[1]-self.c *t)) * np.exp(-t * self.dim *(f*2* np.pi)**2* self.nu)* np.sin(f*2*np.pi * (self.X[2]-self.c *t))
         tmp_me[:] = self.fft.forward(tmp)
 
-
-        #else:
-
-        #    tmp_me[:] = np.sin(2*np.pi * (self.X[0]-self.c*t))*np.sin(2*np.pi * (self.X[1]-self.c*t)) * np.exp(-t * 2 *(2* np.pi)**2* self.nu)
 
 
         return tmp_me

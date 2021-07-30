@@ -24,13 +24,11 @@ import numpy as np
 
 
 
-#import optax
-
 num_nodes = 3
 
-mins = [9,10, 8, 0,0,0]
-means = [11.6, 13.8, 11, 0,0,0]
-maxima = [14, 17, 14, 0,0,0]
+mins   = [0,0,0,0,0,0]
+means  = [0,0,0,0,0,0]
+maxima = [0,0,0,0,0,0]
 
 def _from_model_arch(model_arch, train):
     scale = 1e-7
@@ -106,16 +104,13 @@ def load_model(path):
         steps = jnp.load(f, allow_pickle=True)
     return weights, model_arch, steps
 
-def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, RL_both=None, index = None, imex=None):
-    """
-    A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
 
-    Args:
-        spectral (bool): run in real or spectral space
-        ml (bool): single or multiple levels
-        num_procs (int): number of parallel processors
-    """
 
+
+def run_simulation(nprocs_space=None, sweeper_class=None, use_RL = None, index = None, imex=None, QI=None):
+
+
+    #load the RL model
     rng_key = jax.random.PRNGKey(0)
     rng_key, subkey = jax.random.split(rng_key)
     model_path = "models/dp_model_2021-07-28T11-40-55.669033.npy" 
@@ -125,9 +120,9 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
 
 
+    #setup communicators
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-
 
     world_rank = comm.Get_rank()
     world_size = comm.Get_size()
@@ -156,13 +151,10 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     time_rank = time_comm.Get_rank()
 
 
-
-
-
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-15
-    level_params['dt'] = 0.01 #1E-01 / 2
+    level_params['dt'] = 0.01 
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -176,25 +168,22 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     sweeper_params['initial_guess'] = 'zero'
 
 
-    sweeper_params['comm'] = time_comm #MPI.COMM_WORLD
+    sweeper_params['comm'] = time_comm 
 
     # initialize problem parameters
     problem_params = dict()
-    if ml:
-        problem_params['nvars'] = [(128, 128), (32, 32)]
-    else:
-        problem_params['nvars'] = [(32,32,32)]
-    problem_params['spectral'] = spectral
+
+    problem_params['nvars'] = [(32,32,32)]
+    problem_params['spectral'] = True
     problem_params['comm'] = space_comm
     problem_params['time_comm'] = time_comm
     problem_params['model'] = model
     problem_params['model_params'] = params
     problem_params['subkey'] = subkey
     problem_params['rng_key'] = rng_key
-    problem_params['RL_both'] = False           
     problem_params['dt'] = level_params['dt']    
     problem_params['imex'] = imex
-
+    problem_params['use_RL'] = use_RL
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 100
@@ -205,34 +194,13 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     # controller_params['predict_type'] = 'fine_only'
 
     # fill description dictionary for easy step instantiation
+
+    sweeper_params['QI'] = [QI] 
+    sweeper_params['QE'] = ['PIC'] 
     description = dict()
     description['problem_params'] = problem_params  # pass problem parameters
     description['problem_class'] = advectiondiffusion_imex
     description['sweeper_class'] = sweeper_class #generic_imex_MPI # imex_1st_order
-    if sweeper_class == generic_imex_MPI:
-        if use_RL:
-            sweeper_params['QI'] = ['RL'] 
-            problem_params['use_RL'] = True 
-            if RL_both:
-                problem_params['RL_both'] = True 
-            
-        else:
-            if MIN3:
-                sweeper_params['QI'] = ['MIN3'] 
-                problem_params['use_RL'] = False
-            else: 
-                sweeper_params['QI'] = ['MIN'] 
-                problem_params['use_RL'] = False
-    elif sweeper_class == generic_implicit_MPI:
-        sweeper_params['QI'] = ['MIN'] 
-        problem_params['use_RL'] = False 
-    else:
-        sweeper_params['QI'] = ['LU']  
-        problem_params['use_RL'] = False 
-        #problem_params['RL_both'] = True 
-
-
-
 
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -367,31 +335,31 @@ def main():
         MPI.COMM_WORLD.Barrier()    
         if rank ==0: print("############ RL+0")
         MPI.COMM_WORLD.Barrier()
-        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=False, index=0, imex=True)
+        run_simulation(nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True,  index=0, imex=True, QI = 'RL')
         MPI.COMM_WORLD.Barrier()
         if rank ==0: print("############ RL+RL")
         MPI.COMM_WORLD.Barrier()
-        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True, MIN3=False, RL_both=True, index=1, imex=True)
+        run_simulation(nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = True,  index=1, imex=False, QI = 'RL' )
         MPI.COMM_WORLD.Barrier()
         if rank ==0: print("############ MIN+0")
         MPI.COMM_WORLD.Barrier()
-        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False, MIN3=False, RL_both=False, index=2, imex=True)
+        run_simulation(nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = False,  index=2, imex=True, QI = 'MIN')
         MPI.COMM_WORLD.Barrier()
         if rank ==0: print("############ MIN+MIN")
         MPI.COMM_WORLD.Barrier()   
-        run_simulation(spectral=True, ml=False, nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False, MIN3=False, RL_both=False, index=3, imex=False)
+        run_simulation(nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = False,  index=3, imex=False, QI = 'MIN')
         MPI.COMM_WORLD.Barrier()  
 
     if rank ==0: print("############ LU+0")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False, MIN3=False, RL_both=False, index=4, imex=True)
+    run_simulation(nprocs_space=world_size, sweeper_class = imex_1st_order, use_RL = False,  index=4, imex=True, QI = 'LU')
     MPI.COMM_WORLD.Barrier()   
     if rank ==0: print("############ LU+LU")
     MPI.COMM_WORLD.Barrier()    
-    run_simulation(spectral=True, ml=False, nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, MIN3=False, RL_both=False, index=5, imex=False)
+    run_simulation(nprocs_space=world_size, sweeper_class = generic_implicit, use_RL = False, index=5, imex=False, QI = 'LU')
     MPI.COMM_WORLD.Barrier()   
     if rank ==0: plot()
-    #run_simulation(spectral=True, ml=False, nprocs_space=1, sweeper_class = imex_1st_order, use_RL = False)
+
 
 
 

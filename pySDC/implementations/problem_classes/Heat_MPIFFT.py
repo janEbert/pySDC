@@ -100,6 +100,7 @@ class heat(ptype):
         self.model = problem_params['model']
         self.model_params = list(problem_params['model_params'])
         self.rng_key = problem_params['rng_key'] 
+        self.subkey =  problem_params['subkey'] 
         self.time_comm = problem_params['time_comm'] 
         self.time_rank = self.time_comm.Get_rank()
         self.space_comm = problem_params['comm']
@@ -116,7 +117,8 @@ class heat(ptype):
             #tmp = jnp.array((-self.K2*self.dt*self.nu).flatten(),dtype=float).reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) #.reshape(self.K2.shape[0]*self.K2.shape[1]*self.K2.shape[2],1) 
             tmp = np.ndarray(shape=(self.K2.flatten().size,1),dtype=float, buffer= (-self.nu*self.K2*self.dt).flatten() )
             #print("tmp ", tmp.shape  )
-            self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    #.reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    
+            #self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])    #.reshape(self.K2.shape[0], self.K2.shape[1], self.K2.shape[2])   
+            self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape) 
             #print(self.QD)
 
             #print("vorhersage ",self.model(self.model_params, tmp).shape)
@@ -125,7 +127,7 @@ class heat(ptype):
             #        self.QD[idx] = self.model(self.model_params, -x*self.dt*self.nu)[0][self.time_rank] #, rng=self.subkey
             #    else:
             #        self.QD[idx] = self.model(self.model_params, -2000)[0][self.time_rank]   
-            #print("MAX", max(self.K2.flatten()*self.dt*self.nu))
+            print("MAX", max(self.K2.flatten()*self.dt*self.nu))
             #print(self.time_rank, "min max", min(self.QD.flatten()), max(self.QD.flatten()))
             #assert max(self.K2.flatten()*self.dt*self.nu) < 2000, 'zu gross %s' %max(self.K2.flatten()*0.01*self.nu)  
 

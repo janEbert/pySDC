@@ -137,28 +137,29 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-    rng_key = jax.random.PRNGKey(0)
-    rng_key, subkey = jax.random.split(rng_key)
-    model_path = "models/dp_model_reell.npy"
-
-    params, model_arch, old_steps = load_model(model_path)
-    _, model = _from_model_arch(model_arch, train=True)
-
-
     if False:
+        rng_key = jax.random.PRNGKey(0)
+        rng_key, subkey = jax.random.split(rng_key)
+        #model_path = "models/dp_model_reell.npy"
+        model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
+        params, model_arch, old_steps = load_model(model_path)
+        _, model = _from_model_arch(model_arch, train=True)
+
+
+    if True:
         seed = 0
         eval_seed = seed
         if eval_seed is not None:
             eval_seed += 1
 
         rng_key = jax.random.PRNGKey(0)
-        model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+        #model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+        model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
 
-
-        model_init, model = build_model(num_nodes)
+        model_init, model = _build_model(num_nodes)
         rng_key, subkey = jax.random.split(rng_key)
        
-        params, _ = load_model(model_path)
+        params, _ = _load_model(model_path)
 
     #rng_key = jax.random.PRNGKey(0)
     #rng_key, subkey = jax.random.split(rng_key)
@@ -218,8 +219,8 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-6
-    level_params['dt'] = 1.5*1E-03 #1e-3
+    level_params['restol'] = 1E-12
+    level_params['dt'] = 1*1E-03 #1e-3
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -298,7 +299,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 36*1e-3 #1.0
+    Tend = 38*1e-3 #1.0
 
     #f = None
     #if rank == 0:
