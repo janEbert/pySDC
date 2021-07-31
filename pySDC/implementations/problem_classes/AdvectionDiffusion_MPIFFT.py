@@ -158,7 +158,7 @@ class advectiondiffusion_imex(ptype):
 
 
         if not self.imex:
-            me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*(-1j))) #1j
+            me = rhs / (1.0 + factor * (self.nu*self.K2-self.K1*(-1j))) 
         else:
             me = rhs / (1.0 + factor * self.nu*self.K2)
 

@@ -332,14 +332,16 @@ def main():
 
     if True:
 
-        MPI.COMM_WORLD.Barrier()    
-        if rank ==0: print("############ RL+0")
-        MPI.COMM_WORLD.Barrier()
-        run_simulation(nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True,  index=0, imex=True, QI = 'RL')
         MPI.COMM_WORLD.Barrier()
         if rank ==0: print("############ RL+RL")
         MPI.COMM_WORLD.Barrier()
         run_simulation(nprocs_space=n_space, sweeper_class = generic_implicit_MPI, use_RL = True,  index=1, imex=False, QI = 'RL' )
+
+        MPI.COMM_WORLD.Barrier()    
+        if rank ==0: print("############ RL+0")
+        MPI.COMM_WORLD.Barrier()
+        run_simulation(nprocs_space=n_space, sweeper_class = generic_imex_MPI, use_RL = True,  index=0, imex=True, QI = 'RL')
+
         MPI.COMM_WORLD.Barrier()
         if rank ==0: print("############ MIN+0")
         MPI.COMM_WORLD.Barrier()
