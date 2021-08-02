@@ -25,7 +25,7 @@ mins = [9,10, 8]
 means = [11.6, 13.8, 11]
 maxima = [14, 17, 14]
 
-def build_model(M):
+def aabuild_model(M):
     scale = 1e-3
     glorot_normal = jax.nn.initializers.variance_scaling(
         scale, "fan_avg", "truncated_normal")
@@ -44,12 +44,88 @@ def build_model(M):
 
 
 
-def load_model(path):
+def aaload_model(path):
     with open(path, 'rb') as f:
         weights = jnp.load(f, allow_pickle=True)
     with open(str(path) + '.steps', 'rb') as f:
         steps = jnp.load(f, allow_pickle=True)
     return weights, steps
+
+
+def _from_model_arch(model_arch, train):
+    scale = 1e-7
+    glorot_normal = jax.nn.initializers.variance_scaling(
+        scale, "fan_avg", "truncated_normal")
+    normal = jax.nn.initializers.normal(scale)
+
+    dropout_rate = 0.0
+    mode = 'train' if train else 'test'
+    dropout_keep_rate = 1 - dropout_rate
+
+    model_arch_real = []
+    for tup in model_arch:
+        if not isinstance(tup, tuple):
+            tup = (tup,)
+        name = tup[0]
+        if len(tup) > 1:
+            args = tup[1]
+        if len(tup) > 2:
+            kwargs = tup[2]
+
+        layer = getattr(stax, name)
+        if name == 'Dense':
+            args = args + (glorot_normal, normal)
+        elif name == 'Dropout':
+            args = args + (dropout_keep_rate, mode)
+
+        if len(tup) == 1:
+            model_arch_real.append(layer)
+        elif len(tup) == 2:
+            model_arch_real.append(layer(*args))
+        elif len(tup) == 3:
+            model_arch_real.append(layer(*args, **kwargs))
+        else:
+            raise ValueError('error in model_arch syntax')
+    (model_init, model_apply) = stax.serial(*model_arch_real)
+    return (model_init, model_apply)
+
+
+def build_model(M, train):
+    model_arch = [
+        ('Dense', (128,)),
+        ('Dropout', ()),
+        ('Relu',),
+        ('Dense', (256,)),
+        ('Relu',),
+        ('Dense', (128,)),
+        ('Dropout', ()),
+        ('Relu',),
+        ('Dense', (M,)),
+    ]
+
+    (model_init, model_apply) = _from_model_arch(model_arch, train=train)
+
+    return (model_init, model_apply, model_arch)
+
+
+def build_opt(lr, params):
+
+    lr = optax.cosine_onecycle_schedule(30000, 2 * lr, 0.3, 2e7)
+
+    (opt_init, opt_update, opt_get_params) = optimizers.adam(lr)
+    opt_state = opt_init(params)
+    return (opt_state, opt_update, opt_get_params)
+
+
+def load_model(path):
+    with open(path, 'rb') as f:
+        weights = jnp.load(f, allow_pickle=True)
+    with open(str(path) + '.structure', 'rb') as f:
+        model_arch = jnp.load(f, allow_pickle=True)
+    with open(str(path) + '.steps', 'rb') as f:
+        steps = jnp.load(f, allow_pickle=True)
+    return weights, model_arch, steps
+
 
 def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, index=None):
     """
@@ -61,41 +137,34 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
+    if True:
 
-    seed = 0
-    eval_seed = seed
-    if eval_seed is not None:
-        eval_seed += 1
+        rng_key = jax.random.PRNGKey(0)
+        rng_key, subkey = jax.random.split(rng_key)
+        model_path = "models/dp_model_2021-08-02T09-51-18.783291.npy"
 
-    rng_key = jax.random.PRNGKey(0)
-    model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
-    #model_path = "models/dp_model_complex.npy"
-
-    model_init, model = build_model(num_nodes)
-    rng_key, subkey = jax.random.split(rng_key)
-   
-    params, _ = load_model(model_path)
-
-    #rng_key = jax.random.PRNGKey(0)
-    #rng_key, subkey = jax.random.split(rng_key)
+        params, model_arch, old_steps = load_model(model_path)
+        _, model = _from_model_arch(model_arch, train=True)
 
 
 
-    #rng_key, subkey = jax.random.split(rng_key)
+    else:
 
-    #model_path = "complex_model_2021-06-29T12-51-32.544928.npy" #"dp_model_2021-06-24T09-55-45.128649.npy"
+        seed = 0
+        eval_seed = seed
+        if eval_seed is not None:
+            eval_seed += 1
 
-    #params, _ = load_model(model_path)
+        rng_key = jax.random.PRNGKey(0)
+        model_path = "models/complex_model_2021-06-29T12-51-32.544928.npy"
+        #model_path = "models/dp_model_complex.npy"
+
+        model_init, model = aabuild_model(num_nodes)
+        rng_key, subkey = jax.random.split(rng_key)
+       
+        params, _ = aaload_model(model_path)
 
 
-    #_, model = build_model(3, train=False)
-
-
-
-    #action = model(params, -1j, rng=subkey)
-
-
-    #model = jax.jit(model) 
 
 
     comm = MPI.COMM_WORLD
@@ -146,7 +215,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     if sweeper_class == 'generic_imex_MPI':
         assert sweeper_params['num_nodes'][0] == time_size, 'Need %s processors in time' % sweeper_params['num_nodes']   
 
-    sweeper_params['initial_guess'] = 'spread' #'zero'
+    sweeper_params['initial_guess'] = 'zero'
 
 
     sweeper_params['comm'] = time_comm #MPI.COMM_WORLD
