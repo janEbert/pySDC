@@ -292,8 +292,16 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    MPI.COMM_WORLD.Barrier()    
+    run_time = MPI.Wtime()
+
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    MPI.COMM_WORLD.Barrier()    
+    wt2 = MPI.Wtime() - run_time
+
+
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
@@ -329,7 +337,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         print(out)
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-        out = f'Time to solution: {timing[0][1]:6.4f} sec.'
+        out = f'Time to solution: {wt2:6.4f} sec.'
         f.write(out + '\n')
         print(out)
 
