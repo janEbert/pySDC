@@ -42,7 +42,7 @@ class allencahn_imex(ptype):
         if 'dw' not in problem_params:
             problem_params['dw'] = 0.0
         if 'eps' not in problem_params:
-            problem_params['eps'] = 10 #0.04#0.04
+            problem_params['eps'] = 0.04 #0.04#0.04
         if 'radius' not in problem_params:
             problem_params['radius'] = 0.25
 
@@ -121,7 +121,7 @@ class allencahn_imex(ptype):
             #self.QD[:,:] = self.model(self.model_params, tmp)[:,self.time_rank].reshape(self.K2.shape[0], self.K2.shape[1])    
             self.QD[:,:] = self.model(list(self.model_params), tmp, rng=self.subkey)[:,self.time_rank].reshape(self.K2.shape)
 
-            #print("MAX", max(self.K2.flatten()*self.dt))
+            print("MAX", max(self.K2.flatten()*self.dt))
 
     def multQI(self, x):
         f = self.dtype_u(self.init)

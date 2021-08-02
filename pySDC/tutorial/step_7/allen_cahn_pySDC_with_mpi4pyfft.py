@@ -21,7 +21,7 @@ from jax.experimental import optimizers
 import matplotlib.pyplot as plt
 import numpy as np
 
-num_nodes = 3
+num_nodes = 5
 
 mins = [9,10, 8]
 means = [11.6, 13.8, 11]
@@ -137,16 +137,16 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         num_procs (int): number of parallel processors
     """
 
-    if False:
+    if True:
         rng_key = jax.random.PRNGKey(0)
         rng_key, subkey = jax.random.split(rng_key)
-        #model_path = "models/dp_model_reell.npy"
-        model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
+        model_path = "models/best_dp_model_R2.npy"
+        #model_path = "models/dp_model_2021-07-18T18-22-56.855290.npy" #dp_model_2021-06-24T09-55-45.128649.npy" #dp_model_2021-05-13T16-27-27.359957.npy" #complex_model_2021-06-29T12-51-32.544928.npy"
         params, model_arch, old_steps = load_model(model_path)
         _, model = _from_model_arch(model_arch, train=True)
 
 
-    if True:
+    else:
         seed = 0
         eval_seed = seed
         if eval_seed is not None:
@@ -299,7 +299,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
 
     # set time parameters
     t0 = 0.0
-    Tend = 38*1e-3 #1.0
+    Tend = 36*1e-3 #1.0
 
     #f = None
     #if rank == 0:
