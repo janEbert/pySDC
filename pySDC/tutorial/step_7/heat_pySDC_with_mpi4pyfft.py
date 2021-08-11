@@ -21,6 +21,8 @@ from jax.experimental import optimizers
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .model_utils import load_model
+
 num_nodes = 3
 
 mins = [9,10, 8]
@@ -54,44 +56,6 @@ def aaload_model(path):
     return weights, steps
 
 
-def _from_model_arch(model_arch, train):
-    scale = 1e-7
-    glorot_normal = jax.nn.initializers.variance_scaling(
-        scale, "fan_avg", "truncated_normal")
-    normal = jax.nn.initializers.normal(scale)
-
-    dropout_rate = 0.0
-    mode = 'train' if train else 'test'
-    dropout_keep_rate = 1 - dropout_rate
-
-    model_arch_real = []
-    for tup in model_arch:
-        if not isinstance(tup, tuple):
-            tup = (tup,)
-        name = tup[0]
-        if len(tup) > 1:
-            args = tup[1]
-        if len(tup) > 2:
-            kwargs = tup[2]
-
-        layer = getattr(stax, name)
-        if name == 'Dense':
-            args = args + (glorot_normal, normal)
-        elif name == 'Dropout':
-            args = args + (dropout_keep_rate, mode)
-
-        if len(tup) == 1:
-            model_arch_real.append(layer)
-        elif len(tup) == 2:
-            model_arch_real.append(layer(*args))
-        elif len(tup) == 3:
-            model_arch_real.append(layer(*args, **kwargs))
-        else:
-            raise ValueError('error in model_arch syntax')
-    (model_init, model_apply) = stax.serial(*model_arch_real)
-    return (model_init, model_apply)
-
-
 def build_model(M, train):
     model_arch = [
         ('Dense', (128,)),
@@ -119,16 +83,6 @@ def build_opt(lr, params):
     return (opt_state, opt_update, opt_get_params)
 
 
-def load_model(path):
-    with open(path, 'rb') as f:
-        weights = jnp.load(f, allow_pickle=True)
-    with open(str(path) + '.structure', 'rb') as f:
-        model_arch = jnp.load(f, allow_pickle=True)
-    with open(str(path) + '.steps', 'rb') as f:
-        steps = jnp.load(f, allow_pickle=True)
-    return weights, model_arch, steps
-
-
 def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None, use_RL = None, MIN3=None, index=None):
     """
     A test program to do SDC, MLSDC and PFASST runs for the 2D NLS equation
@@ -144,8 +98,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         rng_key, subkey = jax.random.split(rng_key)
         model_path = "models/best_dp_model_R.npy" 
 
-        params, model_arch, old_steps = load_model(model_path)
-        _, model = _from_model_arch(model_arch, train=True)
+        params, model = load_model(model_path)
 
     if True:
 

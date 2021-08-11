@@ -22,50 +22,13 @@ from jax.experimental import optimizers
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+from .model_utils import load_model
 
 num_nodes = 3
 
 mins   = [0,0,0,0,0,0]
 means  = [0,0,0,0,0,0]
 maxima = [0,0,0,0,0,0]
-
-def _from_model_arch(model_arch, train):
-    scale = 1e-7
-    glorot_normal = jax.nn.initializers.variance_scaling(
-        scale, "fan_avg", "truncated_normal")
-    normal = jax.nn.initializers.normal(scale)
-
-    dropout_rate = 0.0
-    mode = 'train' if train else 'test'
-    dropout_keep_rate = 1 - dropout_rate
-
-    model_arch_real = []
-    for tup in model_arch:
-        if not isinstance(tup, tuple):
-            tup = (tup,)
-        name = tup[0]
-        if len(tup) > 1:
-            args = tup[1]
-        if len(tup) > 2:
-            kwargs = tup[2]
-
-        layer = getattr(stax, name)
-        if name == 'Dense':
-            args = args + (glorot_normal, normal)
-        elif name == 'Dropout':
-            args = args + (dropout_keep_rate, mode)
-
-        if len(tup) == 1:
-            model_arch_real.append(layer)
-        elif len(tup) == 2:
-            model_arch_real.append(layer(*args))
-        elif len(tup) == 3:
-            model_arch_real.append(layer(*args, **kwargs))
-        else:
-            raise ValueError('error in model_arch syntax')
-    (model_init, model_apply) = stax.serial(*model_arch_real)
-    return (model_init, model_apply)
 
 
 def build_model(M, train):
@@ -95,18 +58,6 @@ def build_opt(lr, params):
     return (opt_state, opt_update, opt_get_params)
 
 
-def load_model(path):
-    with open(path, 'rb') as f:
-        weights = jnp.load(f, allow_pickle=True)
-    with open(str(path) + '.structure', 'rb') as f:
-        model_arch = jnp.load(f, allow_pickle=True)
-    with open(str(path) + '.steps', 'rb') as f:
-        steps = jnp.load(f, allow_pickle=True)
-    return weights, model_arch, steps
-
-
-
-
 def run_simulation(nprocs_space=None, sweeper_class=None, use_RL = None, index = None, imex=None, QI=None):
 
 
@@ -115,10 +66,7 @@ def run_simulation(nprocs_space=None, sweeper_class=None, use_RL = None, index =
     rng_key, subkey = jax.random.split(rng_key)
     model_path = "models/dp_model_2021-07-28T11-40-55.669033.npy" 
 
-    params, model_arch, old_steps = load_model(model_path)
-    _, model = _from_model_arch(model_arch, train=True)
-
-
+    params, model = load_model(model_path)
 
     #setup communicators
     comm = MPI.COMM_WORLD
