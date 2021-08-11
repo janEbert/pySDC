@@ -118,7 +118,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
         params, _ = aaload_model(model_path)
 
 
-
+    model = jax.jit(model)
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()

@@ -114,7 +114,7 @@ def run_simulation(spectral=None, ml=None, nprocs_space=None, sweeper_class=None
     #action = model(params, -1j, rng=subkey)
 
 
-    #model = jax.jit(model) 
+    model = jax.jit(model)
 
 
     comm = MPI.COMM_WORLD

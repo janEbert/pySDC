@@ -67,6 +67,7 @@ def run_simulation(nprocs_space=None, sweeper_class=None, use_RL = None, index =
     model_path = "models/dp_model_2021-07-28T11-40-55.669033.npy" 
 
     params, model = load_model(model_path)
+    model = jax.jit(model)
 
     #setup communicators
     comm = MPI.COMM_WORLD
